@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:futeba/screens/utilities/constants.dart';
+import 'package:futeba/utilities/constants.dart';
+
+import '../utilities/constants.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -83,9 +85,12 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _buildForgotPasswordBtn() {
     return Container(
       alignment: Alignment.centerRight,
-      child: FlatButton(
+      child: TextButton(
+        style: TextButton.styleFrom(
+          primary: Colors.blue,
+          onSurface: Colors.red,
+        ),
         onPressed: () => print('Forgot Password Button Pressed'),
-        padding: EdgeInsets.only(right: 0.0),
         child: Text(
           'Forgot Password?',
           style: kLabelStyle,
@@ -125,14 +130,17 @@ class _LoginScreenState extends State<LoginScreen> {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 25.0),
       width: double.infinity,
-      child: RaisedButton(
-        elevation: 5.0,
-        onPressed: () => print('Login Button Pressed'),
-        padding: EdgeInsets.all(15.0),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(30.0),
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          onPrimary: Colors.black87,
+          primary: Colors.grey[300],
+          minimumSize: Size(88, 36),
+          padding: EdgeInsets.symmetric(horizontal: 16),
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(2)),
+          ),
         ),
-        color: Colors.white,
+        onPressed: () => print('Login Button Pressed'),
         child: Text(
           'LOGIN',
           style: TextStyle(
@@ -258,10 +266,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      Color(0xFF73AEF5),
-                      Color(0xFF61A4F1),
-                      Color(0xFF478DE0),
-                      Color(0xFF398AE5),
+                      Color(0xFF4682B4),
+                      Color(0xFF4682B4),
+                      Color(0xFF4682B4),
+                      Color(0xFF4682B4),
                     ],
                     stops: [0.1, 0.4, 0.7, 0.9],
                   ),
