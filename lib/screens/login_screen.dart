@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:futeba/screens/second.dart';
 import 'package:futeba/utilities/constants.dart';
+import 'package:http/http.dart' as http;
 
 import '../utilities/constants.dart';
 
@@ -11,21 +13,20 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   bool _rememberMe = false;
+  var emailController = TextEditingController();
+  var passController = TextEditingController();
 
   Widget _buildEmailTF() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Text(
-          'Email',
-          style: kLabelStyle,
-        ),
         SizedBox(height: 10.0),
         Container(
           alignment: Alignment.centerLeft,
           decoration: kBoxDecorationStyle,
           height: 60.0,
           child: TextField(
+            controller: emailController,
             keyboardType: TextInputType.emailAddress,
             style: TextStyle(
               color: Colors.white,
@@ -51,16 +52,13 @@ class _LoginScreenState extends State<LoginScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Text(
-          'Password',
-          style: kLabelStyle,
-        ),
         SizedBox(height: 10.0),
         Container(
           alignment: Alignment.centerLeft,
           decoration: kBoxDecorationStyle,
           height: 60.0,
           child: TextField(
+            controller: passController,
             obscureText: true,
             style: TextStyle(
               color: Colors.white,
@@ -140,7 +138,7 @@ class _LoginScreenState extends State<LoginScreen> {
             borderRadius: BorderRadius.all(Radius.circular(2)),
           ),
         ),
-        onPressed: () => print('Login Button Pressed'),
+        onPressed: () => login(),
         child: Text(
           'LOGIN',
           style: TextStyle(
@@ -316,5 +314,25 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> login() async {
+    if (passController.text.isNotEmpty && emailController.text.isNotEmpty) {
+      var response = await http.post(Uri.parse("https://regres.in/api/login"),
+          body: ({
+            'email': emailController.text,
+            'password': passController.text
+          }));
+      if (response.statusCode == 200) {
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => Second()));
+      } else {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text("Invalid Credentials")));
+      }
+    } else {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("Black Field Not Allowed")));
+    }
   }
 }
