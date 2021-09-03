@@ -243,8 +243,8 @@ class _MainMenuState extends State<MainMenu> {
           'Content-Type': 'application/json; charset=UTF-8'
         },
         body: jsonEncode(<String, String>{
-          'name': "Davi Miranda",
-          'positionId': "1",
+          'name': "Luiz",
+          'positionId': "6",
           'teamId': "4"
         }));
     if (response.statusCode == 200 || response.statusCode == 201) {
