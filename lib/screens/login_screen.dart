@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:futeba/screens/second.dart';
+import 'package:futeba/screens/main_menu.dart';
 import 'package:futeba/utilities/constants.dart';
 import 'package:http/http.dart' as http;
-
 import '../utilities/constants.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -110,7 +109,7 @@ class _LoginScreenState extends State<LoginScreen> {
               activeColor: Colors.white,
               onChanged: (value) {
                 setState(() {
-                  _rememberMe = value;
+                  _rememberMe = value!;
                 });
               },
             ),
@@ -138,7 +137,7 @@ class _LoginScreenState extends State<LoginScreen> {
             borderRadius: BorderRadius.all(Radius.circular(2)),
           ),
         ),
-        onPressed: () => login(),
+        onPressed: () => loginMock(),
         child: Text(
           'LOGIN',
           style: TextStyle(
@@ -174,7 +173,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Widget _buildSocialBtn(Function onTap, AssetImage logo) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: () {},
       child: Container(
         height: 60.0,
         width: 60.0,
@@ -205,13 +204,13 @@ class _LoginScreenState extends State<LoginScreen> {
           _buildSocialBtn(
             () => print('Login with Facebook'),
             AssetImage(
-              'assets/logos/facebook.jpg',
+              'logos/facebook.jpg',
             ),
           ),
           _buildSocialBtn(
             () => print('Login with Google'),
             AssetImage(
-              'assets/logos/google.jpg',
+              'logos/google.jpg',
             ),
           ),
         ],
@@ -250,6 +249,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color.fromRGBO(58, 66, 86, 1.0),
       body: AnnotatedRegion<SystemUiOverlayStyle>(
         value: SystemUiOverlayStyle.dark,
         child: GestureDetector(
@@ -316,6 +316,11 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  Future<void> loginMock() async {
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => MainMenu()));
+  }
+
   Future<void> login() async {
     if (passController.text.isNotEmpty && emailController.text.isNotEmpty) {
       var response = await http.post(Uri.parse("https://regres.in/api/login"),
@@ -325,7 +330,7 @@ class _LoginScreenState extends State<LoginScreen> {
           }));
       if (response.statusCode == 200) {
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => Second()));
+            context, MaterialPageRoute(builder: (context) => MainMenu()));
       } else {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text("Invalid Credentials")));
