@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:futeba/screens/main_menu.dart';
+import 'package:futeba/screens/player_registration.dart';
 import 'package:http/http.dart' as http;
 
 Future<List<Player>> fetchPlayers(http.Client client) async {
@@ -71,18 +73,28 @@ class _PlayersPageState extends State<PlayersPage> {
         title: new Text("Atletas"),
         centerTitle: true,
         leading: IconButton(
-          onPressed: () {},
+          onPressed: () => dashBoardMenu(context),
           icon: Icon(Icons.home),
         ),
         actions: [
           IconButton(
-            onPressed: () => print("Cadastro de Altletas"),
+            onPressed: () => playersRegister(context),
             icon: Icon(Icons.add_circle_outline),
           ),
         ],
       ),
       body: futureBuilder,
     );
+  }
+
+  void playersRegister(BuildContext context) {
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => PlayerRegistration()));
+  }
+
+  void dashBoardMenu(BuildContext context) {
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => MainMenu()));
   }
 
   Widget createListView(BuildContext context, AsyncSnapshot snapshot) {

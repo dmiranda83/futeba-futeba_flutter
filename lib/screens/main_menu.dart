@@ -33,7 +33,7 @@ class _MainMenuState extends State<MainMenu> {
         Padding(
           padding: const EdgeInsets.all(18.0),
           child: Text(
-            "Bem Vindo! \nRitmo de Festa",
+            "Bem Vindo! Ritmo de Festa",
             style: TextStyle(
                 color: Colors.white,
                 fontSize: 28.0,
@@ -168,7 +168,7 @@ class _MainMenuState extends State<MainMenu> {
 
   void playersPage(BuildContext context) {
     Navigator.push(
-        context, MaterialPageRoute(builder: (context) => MainMenu()));
+        context, MaterialPageRoute(builder: (context) => PlayersPage()));
   }
 
   Future<void> playerRegistration() async {

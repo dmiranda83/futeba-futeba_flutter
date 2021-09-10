@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:futeba/models/players.dart';
 import 'package:futeba/screens/main_menu.dart';
 import 'package:futeba/utilities/constants.dart';
 import 'package:http/http.dart' as http;
 import '../utilities/constants.dart';
 
-class LoginScreen extends StatefulWidget {
+class PlayerRegistration extends StatefulWidget {
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  _PlayerRegistrationState createState() => _PlayerRegistrationState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
-  bool _rememberMe = false;
+class _PlayerRegistrationState extends State<PlayerRegistration> {
   var emailController = TextEditingController();
   var passController = TextEditingController();
 
-  Widget _buildEmailTF() {
+  Widget _buildPlayerName() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -31,14 +31,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   Icons.email_outlined,
                   color: Colors.blueAccent,
                 ),
-                hintText: "Insira seu e-mail ...",
+                hintText: "Nome do atleta ...",
                 hintStyle: kHintTextStyle)),
         SizedBox(height: 10)
       ],
     );
   }
 
-  Widget _buildPasswordTF() {
+  Widget _buildPositionId() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -54,136 +54,30 @@ class _LoginScreenState extends State<LoginScreen> {
                   Icons.lock_outline,
                   color: Colors.blueAccent,
                 ),
-                hintText: "Insira sua senha ...",
+                hintText: "Selecione a posicao do atleta ...",
                 hintStyle: kHintTextStyle)),
         SizedBox(height: 10)
       ],
     );
   }
 
-  Widget _buildForgotPasswordBtn() {
-    return Container(
-      alignment: Alignment.centerRight,
-      child: TextButton(
-        style: TextButton.styleFrom(
-          primary: Colors.blue,
-          onSurface: Colors.red,
-        ),
-        onPressed: () => print('Forgot Password Button Pressed'),
-        child: Text(
-          'Forgot Password?',
-          style: kLabelStyle,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildRememberMeCheckbox() {
-    return Container(
-      height: 20.0,
-      child: Row(
-        children: <Widget>[
-          Theme(
-            data: ThemeData(unselectedWidgetColor: Colors.white),
-            child: Checkbox(
-              value: _rememberMe,
-              checkColor: Colors.green,
-              activeColor: Colors.white,
-              onChanged: (value) {
-                setState(() {
-                  _rememberMe = value!;
-                });
-              },
-            ),
-          ),
-          Text(
-            'Remember me',
-            style: kLabelStyle,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildLoginBtn() {
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 25.0),
-      width: double.infinity,
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          onPrimary: Colors.black87,
-          primary: Colors.grey[300],
-          minimumSize: Size(88, 36),
-          padding: EdgeInsets.symmetric(horizontal: 16),
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(2)),
-          ),
-        ),
-        onPressed: () => loginMock(),
-        child: Text(
-          'LOGIN',
-          style: TextStyle(
-            color: Color(0xFF527DAA),
-            letterSpacing: 1.5,
-            fontSize: 18.0,
-            fontWeight: FontWeight.bold,
-            fontFamily: 'OpenSans',
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSignInWithText() {
-    return Column(
-      children: <Widget>[
-        Text(
-          '- OR -',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.w400,
-          ),
-        ),
-        SizedBox(height: 20.0),
-        Text(
-          'Sign in with',
-          style: kLabelStyle,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSignupBtn() {
-    return GestureDetector(
-      onTap: () => print('Sign Up Button Pressed'),
-      child: RichText(
-        text: TextSpan(
-          children: [
-            TextSpan(
-              text: 'Don\'t have an Account? ',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18.0,
-                fontWeight: FontWeight.w400,
-              ),
-            ),
-            TextSpan(
-              text: 'Sign Up',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18.0,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: new AppBar(
+        title: new Text("Atletas"),
+        centerTitle: true,
+        leading: IconButton(
+          onPressed: () => players(context),
+          icon: Icon(Icons.arrow_back_ios_new_outlined),
+        ),
+        actions: [
+          IconButton(
+            onPressed: () => print("Salva Atleta atletas"),
+            icon: Icon(Icons.save_outlined),
+          ),
+        ],
+      ),
       body: AnnotatedRegion<SystemUiOverlayStyle>(
         value: SystemUiOverlayStyle.dark,
         child: GestureDetector(
@@ -211,16 +105,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       SizedBox(height: 30.0),
-                      _buildEmailTF(),
+                      _buildPlayerName(),
                       SizedBox(
                         height: 30.0,
                       ),
-                      _buildPasswordTF(),
-                      _buildForgotPasswordBtn(),
-                      _buildRememberMeCheckbox(),
-                      _buildLoginBtn(),
-                      _buildSignInWithText(),
-                      _buildSignupBtn(),
+                      _buildPositionId(),
                     ],
                   ),
                 ),
@@ -230,6 +119,11 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
     );
+  }
+
+  void players(BuildContext context) {
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => PlayersPage()));
   }
 
   Future<void> loginMock() async {
