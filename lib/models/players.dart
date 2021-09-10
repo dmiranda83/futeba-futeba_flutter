@@ -69,6 +69,17 @@ class _PlayersPageState extends State<PlayersPage> {
     return new Scaffold(
       appBar: new AppBar(
         title: new Text("Atletas"),
+        centerTitle: true,
+        leading: IconButton(
+          onPressed: () {},
+          icon: Icon(Icons.home),
+        ),
+        actions: [
+          IconButton(
+            onPressed: () => print("Cadastro de Altletas"),
+            icon: Icon(Icons.add_circle_outline),
+          ),
+        ],
       ),
       body: futureBuilder,
     );
@@ -90,7 +101,7 @@ class _PlayersPageState extends State<PlayersPage> {
               subtitle: new Text(players[index].position),
               trailing: Icon(Icons.keyboard_arrow_right),
               onTap: () {
-                Text('Players datails');
+                print("gala");
               },
             ),
             new Divider(
