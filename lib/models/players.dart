@@ -79,7 +79,7 @@ class _PlayersPageState extends State<PlayersPage> {
         actions: [
           IconButton(
             onPressed: () => playersRegister(context),
-            icon: Icon(Icons.add_circle_outline),
+            icon: Icon(Icons.person_add_alt_outlined),
           ),
         ],
       ),
