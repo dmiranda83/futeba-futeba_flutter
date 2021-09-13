@@ -31,18 +31,24 @@ List<Position> parsePositions(String responseBody) {
   return parsed.map<Position>((json) => Position.fromJson(json)).toList();
 }
 
-class PlayerRegistration extends StatefulWidget {
+// ignore: must_be_immutable
+class PlayerEdit extends StatefulWidget {
+  PlayerEdit({required this.player});
+  final Player player;
   @override
-  _PlayerRegistrationState createState() => _PlayerRegistrationState();
+  _PlayerEditState createState() => _PlayerEditState();
 }
 
-class _PlayerRegistrationState extends State<PlayerRegistration> {
+class _PlayerEditState extends State<PlayerEdit> {
   List<Position> _positionResponse = [];
-  final _playerNameController = TextEditingController();
-  late String _selectedPositionIdController = "1";
+  TextEditingController _playerNameController = TextEditingController();
+  late String _selectedPositionIdController =
+      widget.player.positionId.toString();
+  late int _teste = widget.player.id;
 
   @override
   void initState() {
+    _playerNameController.text = widget.player.name;
     super.initState();
   }
 
@@ -51,7 +57,7 @@ class _PlayerRegistrationState extends State<PlayerRegistration> {
     debugDisableShadows = false;
     return Scaffold(
       appBar: new AppBar(
-        title: new Text("Cadastro de Atletas"),
+        title: new Text("Edição de Atletas"),
         centerTitle: true,
         leading: IconButton(
           onPressed: () => players(context),
@@ -72,7 +78,6 @@ class _PlayerRegistrationState extends State<PlayerRegistration> {
           ),
           TextFormField(
             controller: _playerNameController,
-            autofocus: true,
             decoration: InputDecoration(
               labelText: 'Nome do atleta',
               border: OutlineInputBorder(
@@ -137,7 +142,8 @@ class _PlayerRegistrationState extends State<PlayerRegistration> {
   _clickSaveButton(BuildContext context) async {
     String playerName = _playerNameController.text;
     String idPosition = _selectedPositionIdController;
-    playerRegistration(playerName, _selectedPositionIdController);
+    int teste = _teste;
+    playerEdit(playerName, _selectedPositionIdController, teste);
   }
 
   void players(BuildContext context) {
@@ -145,15 +151,16 @@ class _PlayerRegistrationState extends State<PlayerRegistration> {
         context, MaterialPageRoute(builder: (context) => PlayersPage()));
   }
 
-  Future<void> playerRegistration(String playerName, String positionId) async {
+  Future<void> playerEdit(String playerName, String positionId, teste) async {
     Map<String, dynamic> jsonMap = {
-      'id': 11,
-      'player': {'name': playerName, 'positionId': positionId}
+      'id': teste,
+      'name': playerName,
+      'positionId': positionId
     };
     String jsonString = json.encode(jsonMap); // encode map to json
 
     var response = await http.put(
-        Uri.parse("http://localhost:8080/api/v1/teams/11"),
+        Uri.parse("http://localhost:8080/api/v1/players/$teste"),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8'
         },
@@ -173,7 +180,7 @@ class _PlayerRegistrationState extends State<PlayerRegistration> {
       context: context,
       dialogType: DialogType.INFO,
       animType: AnimType.BOTTOMSLIDE,
-      title: 'Atleta cadastrado com sucesso!',
+      title: 'Atleta atualizado com sucesso!',
       btnOkOnPress: () {
         Navigator.push(
             context, MaterialPageRoute(builder: (context) => PlayersPage()));

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:futeba/models/slidable_action.dart';
 import 'package:futeba/screens/main_menu.dart';
+import 'package:futeba/screens/player_edit.dart';
 import 'package:futeba/screens/player_registration.dart';
 import 'package:http/http.dart' as http;
 
@@ -37,12 +38,14 @@ class Player {
   final int id;
   final String name;
   final String position;
+  final int positionId;
   final String photo;
 
   Player({
     required this.id,
     required this.name,
     required this.position,
+    required this.positionId,
     required this.photo,
   });
 
@@ -51,6 +54,7 @@ class Player {
       id: json['id'] as int,
       name: json['name'] as String,
       position: json['position']['name'] as String,
+      positionId: json['position']['id'] as int,
       photo: "https://randomuser.me/api/portraits/men/69.jpg",
     );
   }
@@ -146,12 +150,17 @@ class _PlayersPageState extends State<PlayersPage> {
               caption: 'Editar',
               color: Colors.blueGrey,
               icon: Icons.edit_outlined,
-              onTap: () => print(item.id),
+              onTap: () => playerEdit(context, item),
             )
           ],
         );
       },
     );
+  }
+
+  void playerEdit(BuildContext context, Player player) {
+    Navigator.push(context,
+        MaterialPageRoute(builder: (context) => PlayerEdit(player: player)));
   }
 
   void onDismissed(Player player, SlidableAction action) {
