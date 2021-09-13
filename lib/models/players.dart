@@ -1,6 +1,9 @@
-import 'dart:convert';
 import 'dart:async';
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:futeba/models/slidable_action.dart';
 import 'package:futeba/screens/main_menu.dart';
 import 'package:futeba/screens/player_registration.dart';
 import 'package:http/http.dart' as http;
@@ -9,13 +12,23 @@ Future<List<Player>> fetchPlayers(http.Client client) async {
   final response =
       await client.get(Uri.parse('http://localhost:8080/api/v1/players'));
   if (response.statusCode == 200 || response.statusCode == 201) {
-    return parsePhotos(response.body);
+    return parsePlayer(response.body);
   } else {
     throw Exception('Failed to load players');
   }
 }
 
-List<Player> parsePhotos(String responseBody) {
+Future<Player> deletePlayer(String id) async {
+  final response =
+      await http.delete(Uri.parse('http://localhost:8080/api/v1/players/$id'));
+  if (response.statusCode == 200) {
+    return Player.fromJson(jsonDecode(response.body));
+  } else {
+    throw Exception('Failed to delete Player');
+  }
+}
+
+List<Player> parsePlayer(String responseBody) {
   final parsed = jsonDecode(responseBody).cast<Map<String, dynamic>>();
   return parsed.map<Player>((json) => Player.fromJson(json)).toList();
 }
@@ -50,10 +63,18 @@ class PlayersPage extends StatefulWidget {
 }
 
 class _PlayersPageState extends State<PlayersPage> {
+  late Future<List<Player>> _futurePlayer;
+
+  @override
+  void initState() {
+    super.initState();
+    _futurePlayer = fetchPlayers(http.Client());
+  }
+
   @override
   Widget build(BuildContext context) {
     var futureBuilder = new FutureBuilder(
-      future: fetchPlayers(http.Client()),
+      future: _futurePlayer,
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         switch (snapshot.connectionState) {
           case ConnectionState.none:
@@ -102,26 +123,56 @@ class _PlayersPageState extends State<PlayersPage> {
     return new ListView.builder(
       itemCount: players.length,
       itemBuilder: (BuildContext context, int index) {
-        return new Column(
-          children: <Widget>[
-            new ListTile(
-              leading: CircleAvatar(
-                backgroundColor: Colors.white,
-                backgroundImage: AssetImage('images/atleta.png'),
-              ),
-              title: new Text(players[index].name),
-              subtitle: new Text(players[index].position),
-              trailing: Icon(Icons.keyboard_arrow_right),
-              onTap: () {
-                print("gala");
-              },
+        final item = players[index];
+        return Slidable(
+          key: Key(item.name),
+          dismissal: SlidableDismissal(
+            child: SlidableDrawerDismissal(),
+            onDismissed: (type) {
+              final action = SlidableAction.excluir;
+              onDismissed(item, action);
+            },
+          ),
+          actionPane: SlidableDrawerActionPane(),
+          child: buildListTile(item),
+          secondaryActions: <Widget>[
+            IconSlideAction(
+              caption: 'Excluir',
+              color: Colors.red,
+              icon: Icons.delete_outline_outlined,
+              onTap: () => onDismissed(item, SlidableAction.excluir),
             ),
-            new Divider(
-              height: 2.0,
-            ),
+            IconSlideAction(
+              caption: 'Editar',
+              color: Colors.blueGrey,
+              icon: Icons.edit_outlined,
+              onTap: () => print(item.id),
+            )
           ],
         );
       },
     );
   }
+
+  void onDismissed(Player player, SlidableAction action) {
+    String name = player.name;
+    deletePlayer(player.id.toString());
+    ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: const Text('Atleta excluido com sucesso!')));
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => PlayersPage()));
+  }
+
+  Widget buildListTile(Player item) => ListTile(
+        leading: CircleAvatar(
+          backgroundColor: Colors.white,
+          backgroundImage: AssetImage('images/atleta.png'),
+        ),
+        title: new Text(item.name),
+        subtitle: new Text(item.position),
+        trailing: Icon(Icons.keyboard_arrow_right),
+        onTap: () {
+          print("Detalhes do Atleta");
+        },
+      );
 }

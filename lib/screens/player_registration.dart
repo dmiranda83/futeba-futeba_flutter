@@ -146,13 +146,13 @@ class _PlayerRegistrationState extends State<PlayerRegistration> {
 
   Future<void> playerRegistration(String playerName, String positionId) async {
     Map<String, dynamic> jsonMap = {
-      'id': 4,
+      'id': 11,
       'player': {'name': playerName, 'positionId': positionId}
     };
     String jsonString = json.encode(jsonMap); // encode map to json
 
     var response = await http.put(
-        Uri.parse("http://localhost:8080/api/v1/teams/4"),
+        Uri.parse("http://localhost:8080/api/v1/teams/11"),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8'
         },
