@@ -1,8 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:futeba/screens/main_menu.dart';
 import 'package:futeba/utilities/constants.dart';
 import 'package:http/http.dart' as http;
+
 import '../utilities/constants.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -12,14 +15,15 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   bool _rememberMe = false;
-  var emailController = TextEditingController();
-  var passController = TextEditingController();
+  var _emailController = TextEditingController();
+  var _passController = TextEditingController();
 
   Widget _buildEmailTF() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         TextField(
+            controller: _emailController,
             decoration: InputDecoration(
                 enabledBorder: OutlineInputBorder(
                   borderSide: BorderSide(
@@ -43,6 +47,7 @@ class _LoginScreenState extends State<LoginScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         TextField(
+            controller: _passController,
             decoration: InputDecoration(
                 enabledBorder: OutlineInputBorder(
                   borderSide: BorderSide(
@@ -238,12 +243,18 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> login() async {
-    if (passController.text.isNotEmpty && emailController.text.isNotEmpty) {
-      var response = await http.post(Uri.parse("https://regres.in/api/login"),
-          body: ({
-            'email': emailController.text,
-            'password': passController.text
-          }));
+    if (_passController.text.isNotEmpty && _emailController.text.isNotEmpty) {
+      Map<String, dynamic> jsonMap = {
+        'email': _emailController.text,
+        'password': _passController.text
+      };
+      String jsonString = json.encode(jsonMap);
+      var response = await http.post(
+          Uri.parse("http://localhost:8080/api/v1/user/login"),
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8'
+          },
+          body: jsonString);
       if (response.statusCode == 200) {
         Navigator.push(
             context, MaterialPageRoute(builder: (context) => MainMenu()));

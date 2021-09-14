@@ -147,13 +147,13 @@ class _PlayerRegistrationState extends State<PlayerRegistration> {
 
   Future<void> playerRegistration(String playerName, String positionId) async {
     Map<String, dynamic> jsonMap = {
-      'id': 11,
+      'id': 1,
       'player': {'name': playerName, 'positionId': positionId}
     };
     String jsonString = json.encode(jsonMap); // encode map to json
 
     var response = await http.put(
-        Uri.parse("http://localhost:8080/api/v1/teams/11"),
+        Uri.parse("http://localhost:8080/api/v1/teams/1"),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8'
         },
@@ -162,7 +162,10 @@ class _PlayerRegistrationState extends State<PlayerRegistration> {
         response.statusCode == 201 ||
         response.statusCode == 204) {
       showAlertDialogOnOkCallback();
+    } else if (response.statusCode == 208) {
+      showAlertDialogOnOkCallbackError();
     } else {
+      print(response);
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Houve falha ao cadastrar atleta!")));
     }
@@ -171,9 +174,22 @@ class _PlayerRegistrationState extends State<PlayerRegistration> {
   void showAlertDialogOnOkCallback() {
     AwesomeDialog(
       context: context,
-      dialogType: DialogType.INFO,
+      dialogType: DialogType.SUCCES,
       animType: AnimType.BOTTOMSLIDE,
       title: 'Atleta cadastrado com sucesso!',
+      btnOkOnPress: () {
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => PlayersPage()));
+      },
+    ).show();
+  }
+
+  void showAlertDialogOnOkCallbackError() {
+    AwesomeDialog(
+      context: context,
+      dialogType: DialogType.INFO,
+      animType: AnimType.BOTTOMSLIDE,
+      title: 'Atleta ja cadastrado!',
       btnOkOnPress: () {
         Navigator.push(
             context, MaterialPageRoute(builder: (context) => PlayersPage()));
