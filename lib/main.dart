@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import './screens/login_screen.dart';
+import 'package:futeba/screens/home_page.dart';
 
 main() => runApp(FutebaApp());
 
@@ -9,8 +9,7 @@ class FutebaApp extends StatelessWidget {
     return MaterialApp(
       title: 'Futeba',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData.dark(),
-      home: LoginScreen(),
+      home: HomePage(),
     );
   }
 }

@@ -6,9 +6,9 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:futeba/models/position.dart';
 import 'package:futeba/models/slidable_action.dart';
 import 'package:futeba/models/team.dart';
-import 'package:futeba/screens/main_menu.dart';
-import 'package:futeba/screens/player_edit.dart';
-import 'package:futeba/screens/player_registration.dart';
+import 'package:futeba/screens/main_menu_page.dart';
+import 'package:futeba/screens/player_edit_page.dart';
+import 'package:futeba/screens/player_registration_page.dart';
 import 'package:http/http.dart' as http;
 
 Future<List<Player>> fetchPlayers(http.Client client) async {

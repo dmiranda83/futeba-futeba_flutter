@@ -1,7 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:futeba/models/team.dart';
 
 class SelectTeam extends StatefulWidget {
+  SelectTeam({required this.teams});
+  final List<Team> teams;
   @override
   _SelectTeamState createState() => _SelectTeamState();
 }
