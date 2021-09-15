@@ -2,11 +2,18 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:futeba/models/User.dart';
 import 'package:futeba/screens/main_menu.dart';
 import 'package:futeba/utilities/constants.dart';
 import 'package:http/http.dart' as http;
 
 import '../utilities/constants.dart';
+
+List<User> parseUser(String responseBody) {
+  print(responseBody);
+  final parsed = jsonDecode(responseBody).cast<Map<String, dynamic>>();
+  return parsed.map<User>((json) => User.fromJson(json)).toList();
+}
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -124,7 +131,7 @@ class _LoginScreenState extends State<LoginScreen> {
             borderRadius: BorderRadius.all(Radius.circular(2)),
           ),
         ),
-        onPressed: () => loginMock(),
+        onPressed: () => login(_emailController.text, _passController.text),
         child: Text(
           'LOGIN',
           style: TextStyle(
@@ -242,12 +249,9 @@ class _LoginScreenState extends State<LoginScreen> {
         context, MaterialPageRoute(builder: (context) => MainMenu()));
   }
 
-  Future<void> login() async {
-    if (_passController.text.isNotEmpty && _emailController.text.isNotEmpty) {
-      Map<String, dynamic> jsonMap = {
-        'email': _emailController.text,
-        'password': _passController.text
-      };
+  Future<void> login(String email, String password) async {
+    if (email.isNotEmpty && password.isNotEmpty) {
+      Map<String, dynamic> jsonMap = {'email': email, 'password': password};
       String jsonString = json.encode(jsonMap);
       var response = await http.post(
           Uri.parse("http://localhost:8080/api/v1/user/login"),
@@ -256,8 +260,7 @@ class _LoginScreenState extends State<LoginScreen> {
           },
           body: jsonString);
       if (response.statusCode == 200) {
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => MainMenu()));
+        List<User> users = parseUser(response.body);
       } else {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text("Invalid Credentials")));
