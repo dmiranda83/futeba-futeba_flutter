@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:futeba/models/players.dart';
+import 'package:futeba/models/player.dart';
 import 'package:http/http.dart' as http;
 
 class MainMenu extends StatefulWidget {

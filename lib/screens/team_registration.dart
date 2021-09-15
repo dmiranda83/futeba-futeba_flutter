@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:futeba/models/players.dart';
-import 'package:futeba/screens/main_menu.dart';
 import 'package:futeba/utilities/constants.dart';
-import 'package:http/http.dart' as http;
+
 import '../utilities/constants.dart';
 
 class PlayerRegistration extends StatefulWidget {

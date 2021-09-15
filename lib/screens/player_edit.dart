@@ -2,7 +2,8 @@ import 'dart:convert';
 
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:futeba/models/players.dart';
+import 'package:futeba/models/player.dart';
+import 'package:futeba/models/position.dart';
 import 'package:http/http.dart' as http;
 
 Future<List<Position>> fetchPositions(http.Client client) async {
@@ -12,17 +13,6 @@ Future<List<Position>> fetchPositions(http.Client client) async {
     return parsePositions(response.body);
   } else {
     throw Exception('Failed to load players');
-  }
-}
-
-class Position {
-  final int id;
-  final String name;
-
-  Position({required this.id, required this.name});
-
-  factory Position.fromJson(Map<String, dynamic> json) {
-    return Position(id: json['id'] as int, name: json['name'] as String);
   }
 }
 

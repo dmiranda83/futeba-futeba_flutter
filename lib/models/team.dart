@@ -1,6 +1,6 @@
 import 'package:futeba/models/category.dart';
 import 'package:futeba/models/place.dart';
-import 'package:futeba/models/players.dart';
+import 'package:futeba/models/player.dart';
 
 class Team {
   final int id;
