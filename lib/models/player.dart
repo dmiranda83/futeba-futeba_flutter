@@ -3,7 +3,9 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:futeba/models/position.dart';
 import 'package:futeba/models/slidable_action.dart';
+import 'package:futeba/models/team.dart';
 import 'package:futeba/screens/main_menu.dart';
 import 'package:futeba/screens/player_edit.dart';
 import 'package:futeba/screens/player_registration.dart';
@@ -37,15 +39,13 @@ List<Player> parsePlayer(String responseBody) {
 class Player {
   final int id;
   final String name;
-  final String position;
-  final int positionId;
+  final Position position;
   final String photo;
 
   Player({
     required this.id,
     required this.name,
     required this.position,
-    required this.positionId,
     required this.photo,
   });
 
@@ -53,15 +53,16 @@ class Player {
     return Player(
       id: json['id'] as int,
       name: json['name'] as String,
-      position: json['position']['name'] as String,
-      positionId: json['position']['id'] as int,
+      position: Position.fromJson(json['position']),
       photo: "https://randomuser.me/api/portraits/men/69.jpg",
     );
   }
 }
 
 class PlayersPage extends StatefulWidget {
-  const PlayersPage({Key? key}) : super(key: key);
+  PlayersPage({required this.team});
+  final Team team;
+
   @override
   _PlayersPageState createState() => _PlayersPageState();
 }
@@ -114,12 +115,14 @@ class _PlayersPageState extends State<PlayersPage> {
 
   void playersRegister(BuildContext context) {
     Navigator.push(
-        context, MaterialPageRoute(builder: (context) => PlayerRegistration()));
+        context,
+        MaterialPageRoute(
+            builder: (context) => PlayerRegistration(team: widget.team)));
   }
 
   void dashBoardMenu(BuildContext context) {
-    Navigator.push(
-        context, MaterialPageRoute(builder: (context) => MainMenu()));
+    Navigator.push(context,
+        MaterialPageRoute(builder: (context) => MainMenu(team: widget.team)));
   }
 
   Widget createListView(BuildContext context, AsyncSnapshot snapshot) {
@@ -159,8 +162,11 @@ class _PlayersPageState extends State<PlayersPage> {
   }
 
   void playerEdit(BuildContext context, Player player) {
-    Navigator.push(context,
-        MaterialPageRoute(builder: (context) => PlayerEdit(player: player)));
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) =>
+                PlayerEdit(player: player, team: widget.team)));
   }
 
   void onDismissed(Player player, SlidableAction action) {
@@ -169,7 +175,9 @@ class _PlayersPageState extends State<PlayersPage> {
     ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: const Text('Atleta excluido com sucesso!')));
     Navigator.push(
-        context, MaterialPageRoute(builder: (context) => PlayersPage()));
+        context,
+        MaterialPageRoute(
+            builder: (context) => PlayersPage(team: widget.team)));
   }
 
   Widget buildListTile(Player item) => ListTile(
@@ -178,7 +186,7 @@ class _PlayersPageState extends State<PlayersPage> {
           backgroundImage: AssetImage('images/atleta.png'),
         ),
         title: new Text(item.name),
-        subtitle: new Text(item.position),
+        subtitle: new Text(item.position.name),
         trailing: Icon(Icons.keyboard_arrow_right),
         onTap: () {
           print("Detalhes do Atleta");

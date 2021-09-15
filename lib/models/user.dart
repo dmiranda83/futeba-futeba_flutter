@@ -4,8 +4,8 @@ class User {
   final int id;
   final String name;
   final String cellPhone;
-  final String changePassword;
-  final String active;
+  final bool changePassword;
+  final bool active;
   final String role;
   final List<Team> teams;
 

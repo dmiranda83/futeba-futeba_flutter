@@ -13,7 +13,7 @@ class _PlayerRegistrationState extends State<PlayerRegistration> {
   final _cepController = TextEditingController(); // CEP
   final _enderecoController = TextEditingController(); // Nome da Rua
   final _bairroController = TextEditingController(); // Bairro
-  final _cidadeContoller = TextEditingController(); // Cidade / Localidade
+  final _cidadeController = TextEditingController(); // Cidade / Localidade
   final _ufController = TextEditingController(); //  Unidade federativa Estado.
 
   Widget _buildPlayerName() {
@@ -116,7 +116,7 @@ class _PlayerRegistrationState extends State<PlayerRegistration> {
             height: 8.0,
           ),
           TextFormField(
-            controller: _cidadeContoller,
+            controller: _cidadeController,
             decoration: InputDecoration(
                 border: OutlineInputBorder(), labelText: "Cidade"),
           ),

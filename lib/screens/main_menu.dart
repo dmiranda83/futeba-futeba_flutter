@@ -1,16 +1,21 @@
-import 'dart:convert';
-
-import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:futeba/models/player.dart';
-import 'package:http/http.dart' as http;
+import 'package:futeba/models/team.dart';
 
 class MainMenu extends StatefulWidget {
+  MainMenu({required this.team});
+  final Team team;
   @override
   _MainMenuState createState() => _MainMenuState();
 }
 
 class _MainMenuState extends State<MainMenu> {
+  late String _teamName = widget.team.name;
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,7 +38,7 @@ class _MainMenuState extends State<MainMenu> {
         Padding(
           padding: const EdgeInsets.all(18.0),
           child: Text(
-            "Bem Vindo! Ritmo de Festa",
+            "Bem Vindo!\n $_teamName",
             style: TextStyle(
                 color: Colors.white,
                 fontSize: 28.0,
@@ -167,39 +172,10 @@ class _MainMenuState extends State<MainMenu> {
   }
 
   void playersPage(BuildContext context) {
+    print(widget.team);
     Navigator.push(
-        context, MaterialPageRoute(builder: (context) => PlayersPage()));
-  }
-
-  Future<void> playerRegistration() async {
-    var response = await http.post(
-        Uri.parse("http://localhost:8080/api/v1/players"),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8'
-        },
-        body: jsonEncode(<String, String>{
-          'name': "Luiz",
-          'positionId': "6",
-          'teamId': "4"
-        }));
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      showAlertDialogOnOkCallback();
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Houve falha ao cadastrar atleta!")));
-    }
-  }
-
-  void showAlertDialogOnOkCallback() {
-    AwesomeDialog(
-      context: context,
-      dialogType: DialogType.INFO,
-      animType: AnimType.BOTTOMSLIDE,
-      title: 'Atleta cadastrado com sucesso!',
-      btnOkOnPress: () {
-        //Navigator.push(
-        //   context, MaterialPageRoute(builder: (context) => Players()));
-      },
-    ).show();
+        context,
+        MaterialPageRoute(
+            builder: (context) => PlayersPage(team: widget.team)));
   }
 }

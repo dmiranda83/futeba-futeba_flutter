@@ -4,6 +4,7 @@ import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:futeba/models/player.dart';
 import 'package:futeba/models/position.dart';
+import 'package:futeba/models/team.dart';
 import 'package:http/http.dart' as http;
 
 Future<List<Position>> fetchPositions(http.Client client) async {
@@ -23,8 +24,9 @@ List<Position> parsePositions(String responseBody) {
 
 // ignore: must_be_immutable
 class PlayerEdit extends StatefulWidget {
-  PlayerEdit({required this.player});
+  PlayerEdit({required this.player, required this.team});
   final Player player;
+  final Team team;
   @override
   _PlayerEditState createState() => _PlayerEditState();
 }
@@ -33,8 +35,8 @@ class _PlayerEditState extends State<PlayerEdit> {
   List<Position> _positionResponse = [];
   TextEditingController _playerNameController = TextEditingController();
   late String _selectedPositionIdController =
-      widget.player.positionId.toString();
-  late int _teste = widget.player.id;
+      widget.player.position.id.toString();
+  late int _idPlayer = widget.player.id;
 
   @override
   void initState() {
@@ -132,25 +134,28 @@ class _PlayerEditState extends State<PlayerEdit> {
   _clickSaveButton(BuildContext context) async {
     String playerName = _playerNameController.text;
     String idPosition = _selectedPositionIdController;
-    int teste = _teste;
-    playerEdit(playerName, _selectedPositionIdController, teste);
+    int idPlayer = _idPlayer;
+    playerEdit(playerName, _selectedPositionIdController, idPlayer);
   }
 
   void players(BuildContext context) {
     Navigator.push(
-        context, MaterialPageRoute(builder: (context) => PlayersPage()));
+        context,
+        MaterialPageRoute(
+            builder: (context) => PlayersPage(team: widget.team)));
   }
 
-  Future<void> playerEdit(String playerName, String positionId, teste) async {
+  Future<void> playerEdit(
+      String playerName, String positionId, idPlayer) async {
     Map<String, dynamic> jsonMap = {
-      'id': teste,
+      'id': idPlayer,
       'name': playerName,
       'positionId': positionId
     };
     String jsonString = json.encode(jsonMap); // encode map to json
 
     var response = await http.put(
-        Uri.parse("http://localhost:8080/api/v1/players/$teste"),
+        Uri.parse("http://localhost:8080/api/v1/players/$idPlayer"),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8'
         },
@@ -173,7 +178,9 @@ class _PlayerEditState extends State<PlayerEdit> {
       title: 'Atleta atualizado com sucesso!',
       btnOkOnPress: () {
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => PlayersPage()));
+            context,
+            MaterialPageRoute(
+                builder: (context) => PlayersPage(team: widget.team)));
       },
     ).show();
   }

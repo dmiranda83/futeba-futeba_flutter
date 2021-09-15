@@ -5,10 +5,10 @@ import 'package:futeba/models/player.dart';
 class Team {
   final int id;
   final String name;
-  final String away;
+  final bool away;
   final String responsibleName;
   final String phoneContact1;
-  final String phoneContact2;
+  final String? phoneContact2;
   final Category category;
   final Place place;
   final List<Player> players;

@@ -4,6 +4,7 @@ import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:futeba/models/player.dart';
 import 'package:futeba/models/position.dart';
+import 'package:futeba/models/team.dart';
 import 'package:http/http.dart' as http;
 
 Future<List<Position>> fetchPositions(http.Client client) async {
@@ -22,6 +23,8 @@ List<Position> parsePositions(String responseBody) {
 }
 
 class PlayerRegistration extends StatefulWidget {
+  PlayerRegistration({required this.team});
+  final Team team;
   @override
   _PlayerRegistrationState createState() => _PlayerRegistrationState();
 }
@@ -30,6 +33,7 @@ class _PlayerRegistrationState extends State<PlayerRegistration> {
   List<Position> _positionResponse = [];
   final _playerNameController = TextEditingController();
   late String _selectedPositionIdController = "1";
+  late String _teamId = widget.team.id.toString();
 
   @override
   void initState() {
@@ -132,7 +136,9 @@ class _PlayerRegistrationState extends State<PlayerRegistration> {
 
   void players(BuildContext context) {
     Navigator.push(
-        context, MaterialPageRoute(builder: (context) => PlayersPage()));
+        context,
+        MaterialPageRoute(
+            builder: (context) => PlayersPage(team: widget.team)));
   }
 
   Future<void> playerRegistration(String playerName, String positionId) async {
@@ -143,7 +149,7 @@ class _PlayerRegistrationState extends State<PlayerRegistration> {
     String jsonString = json.encode(jsonMap); // encode map to json
 
     var response = await http.put(
-        Uri.parse("http://localhost:8080/api/v1/teams/1"),
+        Uri.parse("http://localhost:8080/api/v1/teams/$_teamId"),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8'
         },
@@ -169,7 +175,9 @@ class _PlayerRegistrationState extends State<PlayerRegistration> {
       title: 'Atleta cadastrado com sucesso!',
       btnOkOnPress: () {
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => PlayersPage()));
+            context,
+            MaterialPageRoute(
+                builder: (context) => PlayersPage(team: widget.team)));
       },
     ).show();
   }
@@ -182,7 +190,9 @@ class _PlayerRegistrationState extends State<PlayerRegistration> {
       title: 'Atleta ja cadastrado!',
       btnOkOnPress: () {
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => PlayersPage()));
+            context,
+            MaterialPageRoute(
+                builder: (context) => PlayersPage(team: widget.team)));
       },
     ).show();
   }

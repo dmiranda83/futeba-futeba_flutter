@@ -3,17 +3,13 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:futeba/models/User.dart';
+import 'package:futeba/models/team.dart';
 import 'package:futeba/screens/main_menu.dart';
+import 'package:futeba/screens/select_team.dart';
 import 'package:futeba/utilities/constants.dart';
 import 'package:http/http.dart' as http;
 
 import '../utilities/constants.dart';
-
-List<User> parseUser(String responseBody) {
-  print(responseBody);
-  final parsed = jsonDecode(responseBody).cast<Map<String, dynamic>>();
-  return parsed.map<User>((json) => User.fromJson(json)).toList();
-}
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -54,6 +50,7 @@ class _LoginScreenState extends State<LoginScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         TextField(
+            obscureText: true,
             controller: _passController,
             decoration: InputDecoration(
                 enabledBorder: OutlineInputBorder(
@@ -245,8 +242,8 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> loginMock() async {
-    Navigator.push(
-        context, MaterialPageRoute(builder: (context) => MainMenu()));
+    Navigator.push(context,
+        MaterialPageRoute(builder: (context) => MainMenu(team: Team as Team)));
   }
 
   Future<void> login(String email, String password) async {
@@ -260,7 +257,18 @@ class _LoginScreenState extends State<LoginScreen> {
           },
           body: jsonString);
       if (response.statusCode == 200) {
-        List<User> users = parseUser(response.body);
+        final jsonResponse = json.decode(response.body);
+        User user = User.fromJson(jsonResponse);
+        if (user.teams.length > 1) {
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => SelectTeam()));
+        } else if (user.teams.length == 1) {
+          print(user.teams[0]);
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => MainMenu(team: user.teams[0])));
+        }
       } else {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text("Invalid Credentials")));

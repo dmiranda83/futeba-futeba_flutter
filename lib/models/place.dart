@@ -6,7 +6,7 @@ class Place {
   final String city;
   final String neighborhood;
   final String zipCode;
-  final String placeWithoutZipCode;
+  final bool placeWithoutZipCode;
 
   Place({
     required this.id,
@@ -21,13 +21,13 @@ class Place {
 
   factory Place.fromJson(Map<String, dynamic> json) {
     return Place(
-        id: json['id'] as int,
-        name: json['name'] as String,
-        type: json['type'] as String,
-        address: json['address'] as String,
-        city: json['city'] as String,
-        neighborhood: json['neighborhood'] as String,
-        zipCode: json['zipCode'] as String,
-        placeWithoutZipCode: json['placeWithoutZipCode'] as String);
+        id: json['id'],
+        name: json['name'],
+        type: json['type'],
+        address: json['address'],
+        city: json['city'],
+        neighborhood: json['neighborhood'],
+        zipCode: json['zipCode'],
+        placeWithoutZipCode: json['placeWithoutZipCode']);
   }
 }
