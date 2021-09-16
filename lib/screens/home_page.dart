@@ -8,10 +8,6 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) => Scaffold(
         body: SafeArea(
           child: Container(
-            // we will give media query height
-            // double.infinity make it big as my parent allows
-            // while MediaQuery make it big as per the screen
-
             width: double.infinity,
             height: MediaQuery.of(context).size.height,
             padding: EdgeInsets.symmetric(horizontal: 30, vertical: 50),
@@ -23,7 +19,7 @@ class HomePage extends StatelessWidget {
                 Column(
                   children: <Widget>[
                     Text(
-                      "Welcome",
+                      "Bem Vindo",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 30,
@@ -32,21 +28,13 @@ class HomePage extends StatelessWidget {
                     SizedBox(
                       height: 20,
                     ),
-                    Text(
-                      "BackSlash Flutter provides extraordinary flutter tutorials. Do Subscribe! ",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.grey[700],
-                        fontSize: 15,
-                      ),
-                    )
                   ],
                 ),
                 Container(
                   height: MediaQuery.of(context).size.height / 3,
                   decoration: BoxDecoration(
                       image: DecorationImage(
-                          image: AssetImage("images/welcome.png"))),
+                          image: AssetImage("assets/images/welcome.png"))),
                 ),
                 Column(
                   children: <Widget>[
@@ -65,7 +53,7 @@ class HomePage extends StatelessWidget {
                           side: BorderSide(color: Colors.black),
                           borderRadius: BorderRadius.circular(50)),
                       child: Text(
-                        "Login",
+                        "Entrar",
                         style: TextStyle(
                             fontWeight: FontWeight.w600, fontSize: 18),
                       ),
@@ -85,7 +73,7 @@ class HomePage extends StatelessWidget {
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(50)),
                       child: Text(
-                        "Sign up",
+                        "Cadastre-se",
                         style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.w600,

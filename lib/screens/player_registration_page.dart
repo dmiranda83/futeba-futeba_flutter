@@ -88,7 +88,6 @@ class _PlayerRegistrationState extends State<PlayerRegistration> {
             future: fetchPositions(http.Client()),
             builder: (BuildContext, snapshot) {
               if (snapshot.data != null) {
-                //print('project snapshot data is: ${projectSnap.data}');
                 return Container(
                   padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                   decoration: BoxDecoration(
@@ -161,7 +160,6 @@ class _PlayerRegistrationState extends State<PlayerRegistration> {
     } else if (response.statusCode == 208) {
       showAlertDialogOnOkCallbackError();
     } else {
-      print(response);
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Houve falha ao cadastrar atleta!")));
     }

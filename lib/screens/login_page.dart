@@ -127,7 +127,7 @@ class _LoginPageState extends State<LoginPage> {
                     height: 200,
                     decoration: BoxDecoration(
                       image: DecorationImage(
-                          image: AssetImage("images/background.png"),
+                          image: AssetImage("assets/images/background.png"),
                           fit: BoxFit.fitHeight),
                     ),
                   )
@@ -162,7 +162,6 @@ class _LoginPageState extends State<LoginPage> {
               MaterialPageRoute(
                   builder: (context) => SelectTeam(teams: user.teams)));
         } else if (user.teams.length == 1) {
-          print(user.teams[0]);
           Navigator.push(
               context,
               MaterialPageRoute(

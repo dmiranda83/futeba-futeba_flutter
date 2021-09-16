@@ -172,7 +172,6 @@ class _MainMenuState extends State<MainMenu> {
   }
 
   void playersPage(BuildContext context) {
-    print(widget.team);
     Navigator.push(
         context,
         MaterialPageRoute(

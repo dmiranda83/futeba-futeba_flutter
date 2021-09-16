@@ -1,4 +1,10 @@
+import 'dart:convert';
+
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:futeba/models/team.dart';
+import 'package:futeba/screens/main_menu_page.dart';
+import 'package:http/http.dart' as http;
 
 class TeamRegistration extends StatefulWidget {
   TeamRegistration({required this.userId, required this.userName});
@@ -21,64 +27,62 @@ class _TeamRegistrationState extends State<TeamRegistration> {
   final _responsibleNameController = TextEditingController();
   final _phoneContact1Controller = TextEditingController();
   final _phoneContact2Controller = TextEditingController();
-  final _confirmPassController = TextEditingController();
 
   @override
   Widget build(BuildContext context) => Scaffold(
       appBar:
           new AppBar(title: new Text("Cadastro de Equipes"), centerTitle: true),
-      body: isCompleted
-          ? buildCompleted()
-          : Theme(
-              data: Theme.of(context).copyWith(
-                  colorScheme: ColorScheme.light(primary: Colors.blueAccent)),
-              child: Stepper(
-                  steps: getSteps(),
-                  currentStep: currentStep,
-                  onStepContinue: () {
-                    final isLastStep = currentStep == getSteps().length - 1;
-                    if (isLastStep) {
-                      setState(() => isCompleted = true);
-                      print('Chamar API para cadastrar');
-                    } else {
-                      setState(() => currentStep += 1);
-                    }
-                  },
-                  onStepTapped: (step) => setState(() => currentStep -= 1),
-                  onStepCancel: currentStep == 0
-                      ? null
-                      : () => setState(() => currentStep -= 1),
-                  controlsBuilder: (context, {onStepContinue, onStepCancel}) {
-                    final isLastStep = currentStep == getSteps().length - 1;
-                    return Container(
-                      margin: EdgeInsets.only(top: 50),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: ElevatedButton(
-                              child: Text(isLastStep ? 'Confirmar' : "Proximo"),
-                              onPressed: onStepContinue,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          if (currentStep != 0)
-                            Expanded(
-                              child: ElevatedButton(
-                                child: Text('Anterior'),
-                                onPressed: onStepCancel,
-                              ),
-                            ),
-                        ],
+      body: Theme(
+        data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(primary: Colors.blueAccent)),
+        child: Stepper(
+            type: StepperType.horizontal,
+            steps: getSteps(),
+            currentStep: currentStep,
+            onStepContinue: () {
+              final isLastStep = currentStep == getSteps().length - 1;
+              if (isLastStep) {
+                setState(() => isCompleted = true);
+                print('Chamar API para cadastrar');
+              } else {
+                setState(() => currentStep += 1);
+              }
+            },
+            onStepTapped: (step) => setState(() => currentStep -= 1),
+            onStepCancel: currentStep == 0
+                ? null
+                : () => setState(() => currentStep -= 1),
+            controlsBuilder: (context, {onStepContinue, onStepCancel}) {
+              final isLastStep = currentStep == getSteps().length - 1;
+              return Container(
+                margin: EdgeInsets.only(top: 50),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton(
+                        child: Text(isLastStep ? 'Confirmar' : "Proximo"),
+                        onPressed: onStepContinue,
                       ),
-                    );
-                  }),
-            ));
+                    ),
+                    const SizedBox(width: 12),
+                    if (currentStep != 0)
+                      Expanded(
+                        child: ElevatedButton(
+                          child: Text('Anterior'),
+                          onPressed: onStepCancel,
+                        ),
+                      ),
+                  ],
+                ),
+              );
+            }),
+      ));
 
   List<Step> getSteps() => [
         Step(
             state: currentStep > 0 ? StepState.complete : StepState.indexed,
             isActive: currentStep >= 0,
-            title: Text('Dados da Equipe'),
+            title: Text('Equipe'),
             content: Column(
               children: <Widget>[
                 inputFile(label: "Nome da Equipe", controller: _nameController),
@@ -86,10 +90,10 @@ class _TeamRegistrationState extends State<TeamRegistration> {
                     label: "Nome do Responsável",
                     controller: _responsibleNameController),
                 inputFile(
-                    label: "Telefone do Resposável",
+                    label: "Telefone do Resposável 1",
                     controller: _phoneContact1Controller),
                 inputFile(
-                    label: "Telefone do Resposável",
+                    label: "Telefone do Resposável 2",
                     controller: _phoneContact2Controller),
               ],
             )),
@@ -124,10 +128,80 @@ class _TeamRegistrationState extends State<TeamRegistration> {
               ],
             ))
       ];
-}
 
-Widget buildCompleted() {
-  return Column();
+  Future<void> login(
+      String team,
+      bool away,
+      String responsibleName,
+      String phoneContact1,
+      String phoneContact2,
+      String categoryName,
+      String placeName,
+      String placetype,
+      String address,
+      String city,
+      String neighborhood,
+      String zipCode) async {
+    if (team.isNotEmpty &&
+        responsibleName.isNotEmpty &&
+        phoneContact1.isNotEmpty &&
+        phoneContact2.isNotEmpty &&
+        categoryName.isNotEmpty &&
+        placeName.isNotEmpty &&
+        placetype.isNotEmpty &&
+        address.isNotEmpty &&
+        city.isNotEmpty &&
+        neighborhood.isNotEmpty &&
+        zipCode.isNotEmpty) {
+      Map<String, dynamic> jsonMap = {
+        'name': team,
+        'away': away,
+        'responsibleName': responsibleName,
+        'phoneContact1': phoneContact1,
+        'phoneContact2': phoneContact2,
+        'category': {'name': categoryName},
+        'place': {
+          'name': placeName,
+          'type': placetype,
+          'address': address,
+          'city': city,
+          'neighborhood': neighborhood,
+          'zipCode': zipCode
+        }
+      };
+      String jsonString = json.encode(jsonMap);
+      var response = await http.post(
+          Uri.parse("http://localhost:8080/api/v1/teams"),
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8'
+          },
+          body: jsonString);
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+        Team team = Team.fromJson(jsonResponse);
+        showAlertDialogOnOkCallback(team);
+      } else {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text("Invalid Credentials")));
+      }
+    } else {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("Black Field Not Allowed")));
+    }
+  }
+
+  void showAlertDialogOnOkCallback(Team team) {
+    AwesomeDialog(
+      context: context,
+      dialogType: DialogType.SUCCES,
+      animType: AnimType.BOTTOMSLIDE,
+      title: 'Equipe cadastrada com sucesso!',
+      btnOkOnPress: () {
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => MainMenu(team: team)));
+      },
+    ).show();
+  }
 }
 
 Widget inputFile({label, obscureText = false, controller}) {

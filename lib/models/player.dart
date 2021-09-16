@@ -11,9 +11,9 @@ import 'package:futeba/screens/player_edit_page.dart';
 import 'package:futeba/screens/player_registration_page.dart';
 import 'package:http/http.dart' as http;
 
-Future<List<Player>> fetchPlayers(http.Client client) async {
-  final response =
-      await client.get(Uri.parse('http://localhost:8080/api/v1/players'));
+Future<List<Player>> fetchPlayers(http.Client client, String idTeam) async {
+  final response = await client
+      .get(Uri.parse('http://localhost:8080/api/v1/players/$idTeam'));
   if (response.statusCode == 200 || response.statusCode == 201) {
     return parsePlayer(response.body);
   } else {
@@ -73,7 +73,7 @@ class _PlayersPageState extends State<PlayersPage> {
   @override
   void initState() {
     super.initState();
-    _futurePlayer = fetchPlayers(http.Client());
+    _futurePlayer = fetchPlayers(http.Client(), widget.team.id.toString());
   }
 
   @override

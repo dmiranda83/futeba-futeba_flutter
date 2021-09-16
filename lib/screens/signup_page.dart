@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:futeba/models/User.dart';
 import 'package:futeba/screens/team_registration_page.dart';
 import 'package:http/http.dart' as http;
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 class SignupPage extends StatefulWidget {
   @override
@@ -13,6 +14,8 @@ class SignupPage extends StatefulWidget {
 }
 
 class _SignupPageState extends State<SignupPage> {
+  var maskFormatter = new MaskTextInputFormatter(
+      mask: '(##) # ####-####', filter: {"#": RegExp(r'[0-9]')});
   var _nameController = TextEditingController();
   var _celPhoneController = TextEditingController();
   var _emailController = TextEditingController();
@@ -24,7 +27,10 @@ class _SignupPageState extends State<SignupPage> {
         backgroundColor: Colors.white,
         appBar: AppBar(
           elevation: 0,
-          brightness: Brightness.light,
+          systemOverlayStyle: SystemUiOverlayStyle(
+            systemNavigationBarColor: Colors.white, // Navigation bar
+            statusBarColor: Colors.white, // Status bar
+          ),
           backgroundColor: Colors.white,
           leading: IconButton(
             onPressed: () {
@@ -48,7 +54,7 @@ class _SignupPageState extends State<SignupPage> {
                 Column(
                   children: <Widget>[
                     Text(
-                      "Sign up",
+                      "Cadastro",
                       style: TextStyle(
                         fontSize: 30,
                         fontWeight: FontWeight.bold,
@@ -58,7 +64,7 @@ class _SignupPageState extends State<SignupPage> {
                       height: 20,
                     ),
                     Text(
-                      "Create an account, It's free ",
+                      "Cria sua conta, é gratis ",
                       style: TextStyle(fontSize: 15, color: Colors.grey[700]),
                     )
                   ],
@@ -70,7 +76,9 @@ class _SignupPageState extends State<SignupPage> {
                         controller: _nameController),
                     inputFile(
                         label: "Telefone do Responsável",
-                        controller: _celPhoneController),
+                        controller: _celPhoneController,
+                        mask: maskFormatter,
+                        hintText: "(XX) X XXXX-XXXX"),
                     inputFile(label: "Email", controller: _emailController),
                     inputFile(
                         label: "Password",
@@ -121,7 +129,7 @@ class _SignupPageState extends State<SignupPage> {
                   children: <Widget>[
                     Text("Já tem uma conta?"),
                     Text(
-                      " Login",
+                      " Entrar",
                       style:
                           TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
                     )
@@ -168,7 +176,9 @@ class _SignupPageState extends State<SignupPage> {
   }
 }
 
-Widget inputFile({label, obscureText = false, controller}) {
+Widget inputFile(
+    {label, obscureText = false, controller, mask, hintText = ""}) {
+  var masker = mask != null ? mask : new MaskTextInputFormatter(mask: '');
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
@@ -182,8 +192,11 @@ Widget inputFile({label, obscureText = false, controller}) {
       ),
       TextField(
         obscureText: obscureText,
+        inputFormatters: [masker],
         controller: controller,
         decoration: InputDecoration(
+            hintText: hintText,
+            hintStyle: TextStyle(fontSize: 15.0, color: Colors.grey),
             contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
             enabledBorder: OutlineInputBorder(
               borderSide: BorderSide(color: Colors.grey),

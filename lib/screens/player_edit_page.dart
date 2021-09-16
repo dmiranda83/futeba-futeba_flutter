@@ -89,9 +89,8 @@ class _PlayerEditState extends State<PlayerEdit> {
           ),
           FutureBuilder<List<Position>>(
             future: fetchPositions(http.Client()),
-            builder: (BuildContext, snapshot) {
+            builder: (BuildContext context, snapshot) {
               if (snapshot.data != null) {
-                //print('project snapshot data is: ${projectSnap.data}');
                 return Container(
                   padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                   decoration: BoxDecoration(
