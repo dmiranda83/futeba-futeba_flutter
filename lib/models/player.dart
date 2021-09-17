@@ -170,7 +170,6 @@ class _PlayersPageState extends State<PlayersPage> {
   }
 
   void onDismissed(Player player, SlidableAction action) {
-    String name = player.name;
     deletePlayer(player.id.toString());
     ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: const Text('Atleta excluido com sucesso!')));

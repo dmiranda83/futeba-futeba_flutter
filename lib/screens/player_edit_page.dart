@@ -32,7 +32,6 @@ class PlayerEdit extends StatefulWidget {
 }
 
 class _PlayerEditState extends State<PlayerEdit> {
-  List<Position> _positionResponse = [];
   TextEditingController _playerNameController = TextEditingController();
   late String _selectedPositionIdController =
       widget.player.position.id.toString();
@@ -132,7 +131,6 @@ class _PlayerEditState extends State<PlayerEdit> {
 
   _clickSaveButton(BuildContext context) async {
     String playerName = _playerNameController.text;
-    String idPosition = _selectedPositionIdController;
     int idPlayer = _idPlayer;
     playerEdit(playerName, _selectedPositionIdController, idPlayer);
   }

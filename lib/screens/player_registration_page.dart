@@ -30,7 +30,6 @@ class PlayerRegistration extends StatefulWidget {
 }
 
 class _PlayerRegistrationState extends State<PlayerRegistration> {
-  List<Position> _positionResponse = [];
   final _playerNameController = TextEditingController();
   late String _selectedPositionIdController = "1";
   late String _teamId = widget.team.id.toString();
@@ -86,7 +85,7 @@ class _PlayerRegistrationState extends State<PlayerRegistration> {
           ),
           FutureBuilder<List<Position>>(
             future: fetchPositions(http.Client()),
-            builder: (BuildContext, snapshot) {
+            builder: (BuildContext context, snapshot) {
               if (snapshot.data != null) {
                 return Container(
                   padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
@@ -129,7 +128,6 @@ class _PlayerRegistrationState extends State<PlayerRegistration> {
 
   _clickSaveButton(BuildContext context) async {
     String playerName = _playerNameController.text;
-    String idPosition = _selectedPositionIdController;
     playerRegistration(playerName, _selectedPositionIdController);
   }
 

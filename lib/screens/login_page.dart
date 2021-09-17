@@ -15,7 +15,6 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  bool _rememberMe = false;
   var _emailController = TextEditingController();
   var _passController = TextEditingController();
 
@@ -25,7 +24,10 @@ class _LoginPageState extends State<LoginPage> {
         backgroundColor: Colors.white,
         appBar: AppBar(
           elevation: 0,
-          brightness: Brightness.light,
+          systemOverlayStyle: SystemUiOverlayStyle(
+            systemNavigationBarColor: Colors.white, // Navigation bar
+            statusBarColor: Colors.white, // Status bar
+          ),
           backgroundColor: Colors.white,
           leading: IconButton(
             onPressed: () {

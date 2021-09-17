@@ -3,8 +3,11 @@ import 'dart:convert';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:futeba/models/team.dart';
+import 'package:futeba/models/user.dart';
 import 'package:futeba/screens/main_menu_page.dart';
+import 'package:futeba/services/via_cep_service.dart';
 import 'package:http/http.dart' as http;
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 class TeamRegistration extends StatefulWidget {
   TeamRegistration({required this.userId, required this.userName});
@@ -15,18 +18,35 @@ class TeamRegistration extends StatefulWidget {
 }
 
 class _TeamRegistrationState extends State<TeamRegistration> {
+  var maskFormatter = new MaskTextInputFormatter(
+      mask: '(##) # ####-####', filter: {"#": RegExp(r'[0-9]')});
+  late String _userId = widget.userId;
   int currentStep = 0;
   bool isCompleted = false;
-  final _localNameController = TextEditingController(); // CEP
-  final _cepController = TextEditingController(); // CEP
-  final _enderecoController = TextEditingController(); // Nome da Rua
-  final _bairroController = TextEditingController(); // Bairro
-  final _cidadeController = TextEditingController(); // Cidade / Localidade
-  final _ufController = TextEditingController(); //  Unidade federativa Estado.
+  final _placelNameController = TextEditingController();
+  final _zipCodeController = TextEditingController();
+  final _addressController = TextEditingController();
+  final _neighborhoodController = TextEditingController();
+  final _cityController = TextEditingController();
+  final _ufController = TextEditingController();
   final _nameController = TextEditingController();
   final _responsibleNameController = TextEditingController();
   final _phoneContact1Controller = TextEditingController();
   final _phoneContact2Controller = TextEditingController();
+  final _awayController = TextEditingController();
+  final _categoryController = TextEditingController();
+  final _placeTypeController = TextEditingController();
+
+  final _searchCepController = TextEditingController();
+  bool _loading = false;
+  bool _enableField = true;
+  late String _result;
+
+  @override
+  void dispose() {
+    super.dispose();
+    _searchCepController.clear();
+  }
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -43,7 +63,19 @@ class _TeamRegistrationState extends State<TeamRegistration> {
               final isLastStep = currentStep == getSteps().length - 1;
               if (isLastStep) {
                 setState(() => isCompleted = true);
-                print('Chamar API para cadastrar');
+                teamRegistration(
+                    _nameController.text,
+                    _awayController.text,
+                    _responsibleNameController.text,
+                    _phoneContact1Controller.text,
+                    _phoneContact2Controller.text,
+                    _categoryController.text,
+                    _placelNameController.text,
+                    _placeTypeController.text,
+                    _addressController.text,
+                    _cityController.text,
+                    _neighborhoodController.text,
+                    _zipCodeController.text);
               } else {
                 setState(() => currentStep += 1);
               }
@@ -62,6 +94,8 @@ class _TeamRegistrationState extends State<TeamRegistration> {
                       child: ElevatedButton(
                         child: Text(isLastStep ? 'Confirmar' : "Proximo"),
                         onPressed: onStepContinue,
+                        style: ElevatedButton.styleFrom(
+                            primary: Colors.blueAccent),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -91,10 +125,12 @@ class _TeamRegistrationState extends State<TeamRegistration> {
                     controller: _responsibleNameController),
                 inputFile(
                     label: "Telefone do Resposável 1",
-                    controller: _phoneContact1Controller),
+                    controller: _phoneContact1Controller,
+                    mask: maskFormatter),
                 inputFile(
                     label: "Telefone do Resposável 2",
-                    controller: _phoneContact2Controller),
+                    controller: _phoneContact2Controller,
+                    mask: maskFormatter),
               ],
             )),
         Step(
@@ -104,12 +140,12 @@ class _TeamRegistrationState extends State<TeamRegistration> {
             content: Column(
               children: <Widget>[
                 inputFile(
-                    label: "Nome do Local", controller: _localNameController),
-                inputFile(label: "Endereço", controller: _enderecoController),
-                inputFile(label: "Cidade", controller: _cidadeController),
+                    label: "Nome do Local", controller: _placelNameController),
+                inputFileZipCode(label: "Cep", controller: _zipCodeController),
+                inputFile(label: "Endereço", controller: _addressController),
+                inputFile(label: "Cidade", controller: _cityController),
                 inputFile(label: "UF", controller: _ufController),
-                inputFile(label: "Bairro", controller: _bairroController),
-                inputFile(label: "Cep", controller: _cepController)
+                inputFile(label: "Bairro", controller: _neighborhoodController)
               ],
             )),
         Step(
@@ -119,19 +155,19 @@ class _TeamRegistrationState extends State<TeamRegistration> {
             content: Column(
               children: <Widget>[
                 inputFile(
-                    label: "Nome do Local", controller: _localNameController),
-                inputFile(label: "Endereço", controller: _enderecoController),
-                inputFile(label: "Cidade", controller: _cidadeController),
+                    label: "Nome do Local", controller: _placelNameController),
+                inputFile(label: "Endereço", controller: _addressController),
+                inputFile(label: "Cidade", controller: _cityController),
                 inputFile(label: "UF", controller: _ufController),
-                inputFile(label: "Bairro", controller: _bairroController),
-                inputFile(label: "Cep", controller: _cepController)
+                inputFile(label: "Bairro", controller: _neighborhoodController),
+                inputFile(label: "Cep", controller: _zipCodeController)
               ],
             ))
       ];
 
-  Future<void> login(
+  Future<void> teamRegistration(
       String team,
-      bool away,
+      String away,
       String responsibleName,
       String phoneContact1,
       String phoneContact2,
@@ -153,33 +189,38 @@ class _TeamRegistrationState extends State<TeamRegistration> {
         city.isNotEmpty &&
         neighborhood.isNotEmpty &&
         zipCode.isNotEmpty) {
+      bool teamAway = "1" == away ? true : false;
       Map<String, dynamic> jsonMap = {
-        'name': team,
-        'away': away,
-        'responsibleName': responsibleName,
-        'phoneContact1': phoneContact1,
-        'phoneContact2': phoneContact2,
-        'category': {'name': categoryName},
-        'place': {
-          'name': placeName,
-          'type': placetype,
-          'address': address,
-          'city': city,
-          'neighborhood': neighborhood,
-          'zipCode': zipCode
+        'team': {
+          'name': team,
+          'away': teamAway,
+          'responsibleName': responsibleName,
+          'phoneContact1': phoneContact1,
+          'phoneContact2': phoneContact2,
+          'category': {'name': "Futsal"},
+          'place': {
+            'name': placeName,
+            'type': placetype,
+            'address': address,
+            'city': city,
+            'neighborhood': neighborhood,
+            'zipCode': zipCode
+          }
         }
       };
       String jsonString = json.encode(jsonMap);
-      var response = await http.post(
-          Uri.parse("http://localhost:8080/api/v1/teams"),
+      var response = await http.put(
+          Uri.parse("http://localhost:8080/api/v1/user/$_userId"),
           headers: <String, String>{
             'Content-Type': 'application/json; charset=UTF-8'
           },
           body: jsonString);
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 ||
+          response.statusCode == 201 ||
+          response.statusCode == 204) {
         final jsonResponse = json.decode(response.body);
-        Team team = Team.fromJson(jsonResponse);
-        showAlertDialogOnOkCallback(team);
+        User user = User.fromJson(jsonResponse);
+        showAlertDialogOnOkCallback(user.teams[0]);
       } else {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text("Invalid Credentials")));
@@ -202,9 +243,68 @@ class _TeamRegistrationState extends State<TeamRegistration> {
       },
     ).show();
   }
+
+  Widget inputFileZipCode({label, obscureText = false, controller, mask}) {
+    var masker = mask != null ? mask : new MaskTextInputFormatter(mask: '');
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Text(
+          label,
+          style: TextStyle(
+              fontSize: 15, fontWeight: FontWeight.w400, color: Colors.black87),
+        ),
+        SizedBox(
+          height: 5,
+        ),
+        TextFormField(
+          controller: controller,
+          onChanged: (controller) {
+            if (controller.length >= 8) {
+              _searchCep();
+            }
+          },
+          inputFormatters: [masker],
+          decoration: InputDecoration(
+              contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.grey),
+              ),
+              border: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.grey))),
+        ),
+        SizedBox(
+          height: 10,
+        )
+      ],
+    );
+  }
+
+  void _searching(bool enable) {
+    setState(() {
+      _result = enable ? '' : _result;
+      _loading = enable;
+      _enableField = !enable;
+    });
+  }
+
+  Future _searchCep() async {
+    _searching(true);
+    final cep = _zipCodeController.text;
+    final resultCep = await ViaCepService.fetchCep(cep: cep);
+    print(resultCep.localidade); // Exibindo somente a localidade no terminal
+    setState(() {
+      _addressController.text = resultCep.logradouro;
+      _cityController.text = resultCep.localidade;
+      _ufController.text = resultCep.uf;
+      _neighborhoodController.text = resultCep.bairro;
+    });
+    _searching(false);
+  }
 }
 
-Widget inputFile({label, obscureText = false, controller}) {
+Widget inputFile({label, obscureText = false, controller, mask}) {
+  var masker = mask != null ? mask : new MaskTextInputFormatter(mask: '');
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
@@ -216,8 +316,9 @@ Widget inputFile({label, obscureText = false, controller}) {
       SizedBox(
         height: 5,
       ),
-      TextField(
+      TextFormField(
         controller: controller,
+        inputFormatters: [masker],
         decoration: InputDecoration(
             contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
             enabledBorder: OutlineInputBorder(
