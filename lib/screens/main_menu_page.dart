@@ -29,7 +29,7 @@ class _MainMenuState extends State<MainMenu> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               Image.asset(
-                "images/image.png",
+                "assets/images/image.png",
                 width: 52.0,
               )
             ],
@@ -40,7 +40,7 @@ class _MainMenuState extends State<MainMenu> {
           child: Text(
             "Bem Vindo!\n $_teamName",
             style: TextStyle(
-                color: Colors.white,
+                color: Colors.black,
                 fontSize: 28.0,
                 fontWeight: FontWeight.bold),
             textAlign: TextAlign.start,
@@ -71,7 +71,7 @@ class _MainMenuState extends State<MainMenu> {
                         child: Column(
                           children: <Widget>[
                             Image.asset(
-                              "images/todo.png",
+                              "assets/images/todo.png",
                               width: 64.0,
                             ),
                             SizedBox(
@@ -107,7 +107,7 @@ class _MainMenuState extends State<MainMenu> {
                       child: Column(
                         children: <Widget>[
                           Image.asset(
-                            "images/calendar.png",
+                            "assets/images/calendar.png",
                             width: 64.0,
                           ),
                           SizedBox(
@@ -142,7 +142,7 @@ class _MainMenuState extends State<MainMenu> {
                       child: Column(
                         children: <Widget>[
                           Image.asset(
-                            "images/settings.png",
+                            "assets/images/settings.png",
                             width: 64.0,
                           ),
                           SizedBox(

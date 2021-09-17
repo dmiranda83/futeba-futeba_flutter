@@ -13,7 +13,7 @@ import 'package:http/http.dart' as http;
 
 Future<List<Player>> fetchPlayers(http.Client client, String idTeam) async {
   final response = await client
-      .get(Uri.parse('http://localhost:8080/api/v1/players/$idTeam'));
+      .get(Uri.parse('http://10.0.2.2:8080/api/v1/players/team/$idTeam'));
   if (response.statusCode == 200 || response.statusCode == 201) {
     return parsePlayer(response.body);
   } else {
@@ -23,7 +23,7 @@ Future<List<Player>> fetchPlayers(http.Client client, String idTeam) async {
 
 Future<Player> deletePlayer(String id) async {
   final response =
-      await http.delete(Uri.parse('http://localhost:8080/api/v1/players/$id'));
+      await http.delete(Uri.parse('http://10.0.2.2:8080/api/v1/players/$id'));
   if (response.statusCode == 200) {
     return Player.fromJson(jsonDecode(response.body));
   } else {
@@ -67,24 +67,41 @@ class PlayersPage extends StatefulWidget {
   _PlayersPageState createState() => _PlayersPageState();
 }
 
-class _PlayersPageState extends State<PlayersPage> {
+class _PlayersPageState extends State<PlayersPage>
+    with TickerProviderStateMixin {
   late Future<List<Player>> _futurePlayer;
+  late AnimationController controllerAnimation;
 
   @override
   void initState() {
+    controllerAnimation = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 5),
+    )..addListener(() {
+        setState(() {});
+      });
+    controllerAnimation.repeat(reverse: true);
     super.initState();
     _futurePlayer = fetchPlayers(http.Client(), widget.team.id.toString());
+  }
+
+  @override
+  void dispose() {
+    controllerAnimation.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     var futureBuilder = new FutureBuilder(
       future: _futurePlayer,
-      builder: (BuildContext context, AsyncSnapshot snapshot) {
+      builder: (context, AsyncSnapshot snapshot) {
         switch (snapshot.connectionState) {
           case ConnectionState.none:
           case ConnectionState.waiting:
-            return new Text('loading...');
+            return new CircularProgressIndicator(
+              value: controllerAnimation.value,
+            );
           default:
             if (snapshot.hasError)
               return new Text('Error: ${snapshot.error}');
@@ -182,7 +199,7 @@ class _PlayersPageState extends State<PlayersPage> {
   Widget buildListTile(Player item) => ListTile(
         leading: CircleAvatar(
           backgroundColor: Colors.white,
-          backgroundImage: AssetImage('images/atleta.png'),
+          backgroundImage: AssetImage('assets/images/atleta.png'),
         ),
         title: new Text(item.name),
         subtitle: new Text(item.position.name),

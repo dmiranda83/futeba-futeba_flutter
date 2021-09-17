@@ -2,22 +2,53 @@ import 'dart:convert';
 
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:futeba/models/category.dart';
 import 'package:futeba/models/team.dart';
 import 'package:futeba/models/user.dart';
+import 'package:futeba/models/week.dart';
 import 'package:futeba/screens/main_menu_page.dart';
 import 'package:futeba/services/via_cep_service.dart';
 import 'package:http/http.dart' as http;
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
+Future<List<Category>> fetchCategories(http.Client client) async {
+  final response =
+      await client.get(Uri.parse('http://10.0.2.2:8080/api/v1/teamCategories'));
+  if (response.statusCode == 200 || response.statusCode == 201) {
+    return parseCategories(response.body);
+  } else {
+    throw Exception('Failed to load players');
+  }
+}
+
+List<Category> parseCategories(String responseBody) {
+  final parsed = jsonDecode(responseBody).cast<Map<String, dynamic>>();
+  return parsed.map<Category>((json) => Category.fromJson(json)).toList();
+}
+
 class TeamRegistration extends StatefulWidget {
-  TeamRegistration({required this.userId, required this.userName});
+  TeamRegistration(
+      {required this.userId, required this.userName, required this.userPhone});
   final String userId;
   final String userName;
+  final String userPhone;
+
   @override
   _TeamRegistrationState createState() => _TeamRegistrationState();
 }
 
 class _TeamRegistrationState extends State<TeamRegistration> {
+  final allWeeks = Week(title: 'Todos os dias da semana');
+  final weeks = [
+    Week(title: 'Segunda-feira'),
+    Week(title: 'Terça-feira'),
+    Week(title: 'Quarta-feira'),
+    Week(title: 'Quinta-feira'),
+    Week(title: 'Sexta-feira'),
+    Week(title: 'Sabado'),
+    Week(title: 'Domingo'),
+  ];
+  late String _selectedCategoryIdController = "1";
   var maskFormatter = new MaskTextInputFormatter(
       mask: '(##) # ####-####', filter: {"#": RegExp(r'[0-9]')});
   late String _userId = widget.userId;
@@ -35,12 +66,18 @@ class _TeamRegistrationState extends State<TeamRegistration> {
   final _phoneContact2Controller = TextEditingController();
   final _awayController = TextEditingController();
   final _categoryController = TextEditingController();
-  final _placeTypeController = TextEditingController();
 
   final _searchCepController = TextEditingController();
   bool _loading = false;
   bool _enableField = true;
   late String _result;
+
+  @override
+  void initState() {
+    _responsibleNameController.text = widget.userName;
+    _phoneContact1Controller.text = widget.userPhone;
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -56,26 +93,14 @@ class _TeamRegistrationState extends State<TeamRegistration> {
         data: Theme.of(context).copyWith(
             colorScheme: ColorScheme.light(primary: Colors.blueAccent)),
         child: Stepper(
-            type: StepperType.horizontal,
+            type: StepperType.vertical,
             steps: getSteps(),
             currentStep: currentStep,
             onStepContinue: () {
               final isLastStep = currentStep == getSteps().length - 1;
               if (isLastStep) {
                 setState(() => isCompleted = true);
-                teamRegistration(
-                    _nameController.text,
-                    _awayController.text,
-                    _responsibleNameController.text,
-                    _phoneContact1Controller.text,
-                    _phoneContact2Controller.text,
-                    _categoryController.text,
-                    _placelNameController.text,
-                    _placeTypeController.text,
-                    _addressController.text,
-                    _cityController.text,
-                    _neighborhoodController.text,
-                    _zipCodeController.text);
+                _clickSaveButton(context);
               } else {
                 setState(() => currentStep += 1);
               }
@@ -116,7 +141,7 @@ class _TeamRegistrationState extends State<TeamRegistration> {
         Step(
             state: currentStep > 0 ? StepState.complete : StepState.indexed,
             isActive: currentStep >= 0,
-            title: Text('Equipe'),
+            title: Text('Responsavel'),
             content: Column(
               children: <Widget>[
                 inputFile(label: "Nome da Equipe", controller: _nameController),
@@ -136,6 +161,60 @@ class _TeamRegistrationState extends State<TeamRegistration> {
         Step(
             state: currentStep > 0 ? StepState.complete : StepState.indexed,
             isActive: currentStep >= 1,
+            title: Text('Equipe'),
+            content: Column(
+              children: <Widget>[
+                FutureBuilder<List<Category>>(
+                  future: fetchCategories(http.Client()),
+                  builder: (BuildContext context, snapshot) {
+                    if (snapshot.data != null) {
+                      return Container(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                        decoration: BoxDecoration(
+                            borderRadius: new BorderRadius.circular(10),
+                            border: Border.all(color: Colors.blueAccent)),
+                        child: DropdownButton(
+                          items: snapshot.data!.map((value) {
+                            return new DropdownMenuItem(
+                              value: value.id.toString(),
+                              child: new Text(
+                                value.name,
+                              ),
+                            );
+                          }).toList(),
+                          value: _selectedCategoryIdController,
+                          onChanged: (value) {
+                            FocusScope.of(context)
+                                .requestFocus(new FocusNode());
+                            setState(() {
+                              _categoryController.text = "Futsal";
+                              _selectedCategoryIdController = value.toString();
+                            });
+                          },
+                          isExpanded: true,
+                          hint: Text(
+                            'Selecione uma posicao',
+                          ),
+                        ),
+                      );
+                    }
+                    if (snapshot.data == null) {
+                      return Text("Nao encontrou dados");
+                    }
+                    return Container();
+                  },
+                ),
+                buildGroupCheckBox(allWeeks),
+                Divider(
+                  color: Colors.blueAccent,
+                ),
+                ...weeks.map(buildCheckbox).toList(),
+              ],
+            )),
+        Step(
+            state: currentStep > 0 ? StepState.complete : StepState.indexed,
+            isActive: currentStep >= 2,
             title: Text('Endereço'),
             content: Column(
               children: <Widget>[
@@ -150,20 +229,93 @@ class _TeamRegistrationState extends State<TeamRegistration> {
             )),
         Step(
             state: currentStep > 0 ? StepState.complete : StepState.indexed,
-            isActive: currentStep >= 2,
+            isActive: currentStep >= 3,
             title: Text('Completo'),
             content: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                inputFile(
-                    label: "Nome do Local", controller: _placelNameController),
-                inputFile(label: "Endereço", controller: _addressController),
-                inputFile(label: "Cidade", controller: _cityController),
-                inputFile(label: "UF", controller: _ufController),
-                inputFile(label: "Bairro", controller: _neighborhoodController),
-                inputFile(label: "Cep", controller: _zipCodeController)
+                inputTextComplete(
+                    label: 'Nome da Equipe', text: _nameController.text),
+                inputTextComplete(
+                    label: 'Nome do Resposanvel',
+                    text: _responsibleNameController.text),
+                inputTextComplete(
+                    label: 'Telefone do Resposanvel 1',
+                    text: _phoneContact1Controller.text),
+                inputTextComplete(
+                    label: 'Telefone do Resposanvel 2',
+                    text: _phoneContact2Controller.text),
+                inputTextComplete(
+                    label: 'Categoria', text: _selectedCategoryIdController),
+                inputTextComplete(
+                    label: 'Jogos como Mandante',
+                    text: _selectedCategoryIdController),
+                inputTextComplete(
+                    label: 'Jogos como Visitante',
+                    text: _selectedCategoryIdController),
+                inputTextComplete(
+                    label: 'Local', text: _placelNameController.text),
+                inputTextComplete(label: 'Cep', text: _zipCodeController.text),
+                inputTextComplete(
+                    label: 'Endereço', text: _addressController.text),
+                inputTextComplete(label: 'Cidade', text: _cityController.text),
+                inputTextComplete(
+                    label: 'Bairro', text: _neighborhoodController.text),
+                inputTextComplete(label: 'UF', text: _ufController.text)
               ],
             ))
       ];
+
+  Widget buildCheckbox(Week checkbox) => CheckboxListTile(
+        controlAffinity: ListTileControlAffinity.leading,
+        activeColor: Colors.blueAccent,
+        value: checkbox.checked,
+        title: Text(
+          checkbox.title,
+          style: TextStyle(fontSize: 20),
+        ),
+        onChanged: (checked) => setState(() {
+          checkbox.checked = checked!;
+          allWeeks.checked = weeks.every((week) => week.checked);
+        }),
+      );
+
+  Widget buildGroupCheckBox(Week checkbox) => CheckboxListTile(
+        controlAffinity: ListTileControlAffinity.leading,
+        activeColor: Colors.blueAccent,
+        value: checkbox.checked,
+        title: Text(
+          checkbox.title,
+          style: TextStyle(fontSize: 20),
+        ),
+        onChanged: toggleGroupCheckbox,
+      );
+
+  void toggleGroupCheckbox(bool? value) {
+    if (value == null) return;
+    setState(() {
+      allWeeks.checked = value;
+      weeks.forEach((week) => week.checked = value);
+    });
+  }
+
+  _clickSaveButton(BuildContext context) async {
+    List<Week> _checkedWeeks = List.from(weeks.where((item) => item.checked));
+    print(_checkedWeeks);
+    teamRegistration(
+        _nameController.text,
+        _awayController.text,
+        _responsibleNameController.text,
+        _phoneContact1Controller.text,
+        _phoneContact2Controller.text,
+        _categoryController.text,
+        _placelNameController.text,
+        _addressController.text,
+        _cityController.text,
+        _neighborhoodController.text,
+        _zipCodeController.text,
+        _checkedWeeks);
+  }
 
   Future<void> teamRegistration(
       String team,
@@ -173,22 +325,20 @@ class _TeamRegistrationState extends State<TeamRegistration> {
       String phoneContact2,
       String categoryName,
       String placeName,
-      String placetype,
       String address,
       String city,
       String neighborhood,
-      String zipCode) async {
+      String zipCode,
+      List<Week> weeks) async {
     if (team.isNotEmpty &&
         responsibleName.isNotEmpty &&
         phoneContact1.isNotEmpty &&
-        phoneContact2.isNotEmpty &&
-        categoryName.isNotEmpty &&
         placeName.isNotEmpty &&
-        placetype.isNotEmpty &&
         address.isNotEmpty &&
         city.isNotEmpty &&
         neighborhood.isNotEmpty &&
         zipCode.isNotEmpty) {
+      List jsonList = weeks.map((week) => week.toJson()).toList();
       bool teamAway = "1" == away ? true : false;
       Map<String, dynamic> jsonMap = {
         'team': {
@@ -200,17 +350,17 @@ class _TeamRegistrationState extends State<TeamRegistration> {
           'category': {'name': "Futsal"},
           'place': {
             'name': placeName,
-            'type': placetype,
             'address': address,
             'city': city,
             'neighborhood': neighborhood,
             'zipCode': zipCode
-          }
+          },
+          'weeks': jsonList
         }
       };
       String jsonString = json.encode(jsonMap);
       var response = await http.put(
-          Uri.parse("http://localhost:8080/api/v1/user/$_userId"),
+          Uri.parse("http://10.0.2.2:8080/api/v1/user/$_userId"),
           headers: <String, String>{
             'Content-Type': 'application/json; charset=UTF-8'
           },
@@ -292,7 +442,6 @@ class _TeamRegistrationState extends State<TeamRegistration> {
     _searching(true);
     final cep = _zipCodeController.text;
     final resultCep = await ViaCepService.fetchCep(cep: cep);
-    print(resultCep.localidade); // Exibindo somente a localidade no terminal
     setState(() {
       _addressController.text = resultCep.logradouro;
       _cityController.text = resultCep.localidade;
@@ -301,6 +450,23 @@ class _TeamRegistrationState extends State<TeamRegistration> {
     });
     _searching(false);
   }
+}
+
+Widget inputTextComplete({label, text}) {
+  return Text.rich(
+    TextSpan(
+      children: [
+        TextSpan(
+          text: '$label: ',
+          style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+        ),
+        TextSpan(
+          text: text,
+          style: TextStyle(fontSize: 15),
+        ),
+      ],
+    ),
+  );
 }
 
 Widget inputFile({label, obscureText = false, controller, mask}) {

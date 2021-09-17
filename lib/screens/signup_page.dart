@@ -152,7 +152,7 @@ class _SignupPageState extends State<SignupPage> {
       };
       String jsonString = json.encode(jsonMap);
       var response = await http.post(
-          Uri.parse("http://localhost:8080/api/v1/user/signup"),
+          Uri.parse("http://10.0.2.2:8080/api/v1/user/signup"),
           headers: <String, String>{
             'Content-Type': 'application/json; charset=UTF-8'
           },
@@ -164,7 +164,10 @@ class _SignupPageState extends State<SignupPage> {
             context,
             MaterialPageRoute(
                 builder: (context) => TeamRegistration(
-                    userId: user.id.toString(), userName: user.name)));
+                      userId: user.id.toString(),
+                      userName: user.name,
+                      userPhone: user.cellPhone,
+                    )));
       } else {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text("Invalid Credentials")));

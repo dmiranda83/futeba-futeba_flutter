@@ -9,7 +9,7 @@ import 'package:http/http.dart' as http;
 
 Future<List<Position>> fetchPositions(http.Client client) async {
   final response = await client
-      .get(Uri.parse('http://localhost:8080/api/v1/playerPositions'));
+      .get(Uri.parse('http://10.0.2.2:8080/api/v1/playerPositions'));
   if (response.statusCode == 200 || response.statusCode == 201) {
     return parsePositions(response.body);
   } else {
@@ -110,7 +110,7 @@ class _PlayerRegistrationState extends State<PlayerRegistration> {
                     },
                     isExpanded: true,
                     hint: Text(
-                      'Select Source',
+                      'Selecione uma posicao',
                     ),
                   ),
                 );
@@ -146,7 +146,7 @@ class _PlayerRegistrationState extends State<PlayerRegistration> {
     String jsonString = json.encode(jsonMap); // encode map to json
 
     var response = await http.put(
-        Uri.parse("http://localhost:8080/api/v1/teams/$_teamId"),
+        Uri.parse("http://10.0.2.2:8080/api/v1/teams/$_teamId"),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8'
         },

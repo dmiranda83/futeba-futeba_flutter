@@ -9,6 +9,10 @@ class FutebaApp extends StatelessWidget {
     return MaterialApp(
       title: 'Futeba',
       debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        platform: TargetPlatform.iOS,
+        unselectedWidgetColor: Colors.blueAccent
+      ),
       home: HomePage(),
     );
   }
