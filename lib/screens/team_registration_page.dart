@@ -48,7 +48,7 @@ class _TeamRegistrationState extends State<TeamRegistration> {
     Week(title: 'Sabado'),
     Week(title: 'Domingo'),
   ];
-  late String _selectedCategoryIdController = "1";
+  late String _selectedCategoryIdController = "Futsal";
   var maskFormatter = new MaskTextInputFormatter(
       mask: '(##) # ####-####', filter: {"#": RegExp(r'[0-9]')});
   late String _userId = widget.userId;
@@ -177,7 +177,7 @@ class _TeamRegistrationState extends State<TeamRegistration> {
                         child: DropdownButton(
                           items: snapshot.data!.map((value) {
                             return new DropdownMenuItem(
-                              value: value.id.toString(),
+                              value: value.name,
                               child: new Text(
                                 value.name,
                               ),
@@ -188,7 +188,7 @@ class _TeamRegistrationState extends State<TeamRegistration> {
                             FocusScope.of(context)
                                 .requestFocus(new FocusNode());
                             setState(() {
-                              _categoryController.text = "Futsal";
+                              _categoryController.text = value.toString();
                               _selectedCategoryIdController = value.toString();
                             });
                           },
@@ -347,7 +347,7 @@ class _TeamRegistrationState extends State<TeamRegistration> {
           'responsibleName': responsibleName,
           'phoneContact1': phoneContact1,
           'phoneContact2': phoneContact2,
-          'category': {'name': "Futsal"},
+          'category': {'name': categoryName},
           'place': {
             'name': placeName,
             'address': address,
@@ -449,6 +449,14 @@ class _TeamRegistrationState extends State<TeamRegistration> {
       _neighborhoodController.text = resultCep.bairro;
     });
     _searching(false);
+  }
+
+  Widget _circularLoading() {
+    return Container(
+      height: 15.0,
+      width: 15.0,
+      child: CircularProgressIndicator(),
+    );
   }
 }
 

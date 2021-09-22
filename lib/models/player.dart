@@ -99,9 +99,7 @@ class _PlayersPageState extends State<PlayersPage>
         switch (snapshot.connectionState) {
           case ConnectionState.none:
           case ConnectionState.waiting:
-            return new CircularProgressIndicator(
-              value: controllerAnimation.value,
-            );
+            return _circularLoading();
           default:
             if (snapshot.hasError)
               return new Text('Error: ${snapshot.error}');
@@ -127,6 +125,14 @@ class _PlayersPageState extends State<PlayersPage>
         ],
       ),
       body: futureBuilder,
+    );
+  }
+
+  Widget _circularLoading() {
+    return Container(
+      height: 15.0,
+      width: 15.0,
+      child: CircularProgressIndicator(),
     );
   }
 
