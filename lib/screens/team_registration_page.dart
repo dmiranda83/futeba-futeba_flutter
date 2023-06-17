@@ -12,8 +12,8 @@ import 'package:http/http.dart' as http;
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 Future<List<Category>> fetchCategories(http.Client client) async {
-  final response =
-      await client.get(Uri.parse('http://10.0.2.2:8080/api/v1/teamCategories'));
+  final response = await client
+      .get(Uri.parse('http://localhost:8080/api/v1/teamCategories'));
   if (response.statusCode == 200 || response.statusCode == 201) {
     return parseCategories(response.body);
   } else {
@@ -109,7 +109,7 @@ class _TeamRegistrationState extends State<TeamRegistration> {
             onStepCancel: currentStep == 0
                 ? null
                 : () => setState(() => currentStep -= 1),
-            controlsBuilder: (context, {onStepContinue, onStepCancel}) {
+            controlsBuilder: (BuildContext context, ControlsDetails details) {
               final isLastStep = currentStep == getSteps().length - 1;
               return Container(
                 margin: EdgeInsets.only(top: 50),
@@ -118,9 +118,9 @@ class _TeamRegistrationState extends State<TeamRegistration> {
                     Expanded(
                       child: ElevatedButton(
                         child: Text(isLastStep ? 'Confirmar' : "Proximo"),
-                        onPressed: onStepContinue,
+                        onPressed: details.onStepContinue,
                         style: ElevatedButton.styleFrom(
-                            primary: Colors.blueAccent),
+                            backgroundColor: Colors.blueAccent),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -128,7 +128,7 @@ class _TeamRegistrationState extends State<TeamRegistration> {
                       Expanded(
                         child: ElevatedButton(
                           child: Text('Anterior'),
-                          onPressed: onStepCancel,
+                          onPressed: details.onStepCancel,
                         ),
                       ),
                   ],
@@ -194,7 +194,7 @@ class _TeamRegistrationState extends State<TeamRegistration> {
                           },
                           isExpanded: true,
                           hint: Text(
-                            'Selecione uma posicao',
+                            'Selecione uma categoria',
                           ),
                         ),
                       );
@@ -301,7 +301,7 @@ class _TeamRegistrationState extends State<TeamRegistration> {
 
   _clickSaveButton(BuildContext context) async {
     List<Week> _checkedWeeks = List.from(weeks.where((item) => item.checked));
-    print(_checkedWeeks);
+
     teamRegistration(
         _nameController.text,
         _awayController.text,
@@ -358,9 +358,11 @@ class _TeamRegistrationState extends State<TeamRegistration> {
           'weeks': jsonList
         }
       };
+
       String jsonString = json.encode(jsonMap);
+
       var response = await http.put(
-          Uri.parse("http://10.0.2.2:8080/api/v1/user/$_userId"),
+          Uri.parse("http://localhost:8080/api/v1/user/$_userId"),
           headers: <String, String>{
             'Content-Type': 'application/json; charset=UTF-8'
           },
@@ -369,6 +371,7 @@ class _TeamRegistrationState extends State<TeamRegistration> {
           response.statusCode == 201 ||
           response.statusCode == 204) {
         final jsonResponse = json.decode(response.body);
+
         User user = User.fromJson(jsonResponse);
         showAlertDialogOnOkCallback(user.teams[0]);
       } else {

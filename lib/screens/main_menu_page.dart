@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:futeba/models/player.dart';
 import 'package:futeba/models/team.dart';
 
@@ -18,157 +19,106 @@ class _MainMenuState extends State<MainMenu> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: SafeArea(
-            child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Image.asset(
-                "assets/images/image.png",
-                width: 52.0,
-              )
+    double width = MediaQuery.of(context).size.width - 100;
+    return Container(
+      color: Color(0xFF272837),
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(0, 40, 0, 20),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Column(
+                children: [
+                  Text(
+                    'Ola!',
+                    style: TextStyle(
+                        fontFamily: 'Manrope',
+                        fontWeight: FontWeight.bold,
+                        decoration: TextDecoration.none,
+                        fontSize: 36,
+                        color: Colors.white),
+                  ),
+                  Text(_teamName,
+                      style: TextStyle(
+                          fontFamily: 'Manrope',
+                          fontWeight: FontWeight.bold,
+                          decoration: TextDecoration.none,
+                          fontSize: 36,
+                          color: Colors.white))
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  circButton(FontAwesomeIcons.instagram),
+                  circButton(FontAwesomeIcons.accusoft),
+                  circButton(FontAwesomeIcons.whatsapp),
+                  circButton(FontAwesomeIcons.facebook)
+                ],
+              ),
+              Wrap(runSpacing: 10, children: [
+                modeButton('ATLETAS', FontAwesomeIcons.airbnb,
+                    Color(0xFF2F80ED), width),
+                modeButton('TIMES', FontAwesomeIcons.footballBall,
+                    Color(0xFFDF1D5A), width)
+              ])
             ],
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.all(18.0),
-          child: Text(
-            "Bem Vindo!\n $_teamName",
-            style: TextStyle(
-                color: Colors.black,
-                fontSize: 28.0,
-                fontWeight: FontWeight.bold),
-            textAlign: TextAlign.start,
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: Center(
-            child: Wrap(
-              spacing: 20,
-              runSpacing: 20.0,
-              children: <Widget>[
-                SizedBox(
-                  width: 160.0,
-                  height: 160.0,
-                  child: Card(
-                    color: Color.fromARGB(255, 21, 21, 21),
-                    elevation: 2.0,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.0)),
-                    child: InkWell(
-                      onTap: () {
-                        playersPage(context);
-                      },
-                      child: Center(
-                          child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          children: <Widget>[
-                            Image.asset(
-                              "assets/images/todo.png",
-                              width: 64.0,
-                            ),
-                            SizedBox(
-                              height: 10.0,
-                            ),
-                            Text(
-                              "Atletas",
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 20.0),
-                            ),
-                            SizedBox(
-                              height: 5.0,
-                            )
-                          ],
-                        ),
-                      )),
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  width: 160.0,
-                  height: 160.0,
-                  child: Card(
-                    color: Color.fromARGB(255, 21, 21, 21),
-                    elevation: 2.0,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.0)),
-                    child: Center(
-                        child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        children: <Widget>[
-                          Image.asset(
-                            "assets/images/calendar.png",
-                            width: 64.0,
-                          ),
-                          SizedBox(
-                            height: 10.0,
-                          ),
-                          Text(
-                            "Agenda",
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20.0),
-                          ),
-                          SizedBox(
-                            height: 5.0,
-                          )
-                        ],
-                      ),
-                    )),
-                  ),
-                ),
-                SizedBox(
-                  width: 160.0,
-                  height: 160.0,
-                  child: Card(
-                    color: Color.fromARGB(255, 21, 21, 21),
-                    elevation: 2.0,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.0)),
-                    child: Center(
-                        child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        children: <Widget>[
-                          Image.asset(
-                            "assets/images/settings.png",
-                            width: 64.0,
-                          ),
-                          SizedBox(
-                            height: 10.0,
-                          ),
-                          Text(
-                            "Estatisticas",
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20.0),
-                          ),
-                          SizedBox(
-                            height: 5.0,
-                          )
-                        ],
-                      ),
-                    )),
-                  ),
-                ),
-              ],
+      ),
+    );
+  }
+
+  Padding circButton(IconData icon) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4.0),
+      child: RawMaterialButton(
+          onPressed: () {},
+          fillColor: Colors.white,
+          shape: CircleBorder(),
+          constraints: BoxConstraints(minHeight: 85, minWidth: 85),
+          child: FaIcon(icon, size: 50, color: Color(0xFF2F3041))),
+    );
+  }
+
+  GestureDetector modeButton(
+      String title, IconData icon, Color color, double width) {
+    return GestureDetector(
+      child: Container(
+        width: width,
+        decoration: BoxDecoration(
+            color: color, borderRadius: BorderRadius.all(Radius.circular(16))),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(25.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        decoration: TextDecoration.none,
+                        fontFamily: 'Manrope',
+                        color: Colors.white,
+                        fontSize: 18),
+                  )
+                ],
+              ),
             ),
-          ),
-        )
-      ],
-    )));
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 18),
+              child: FaIcon(icon, size: 60, color: Colors.white),
+            )
+          ],
+        ),
+      ),
+    );
   }
 
   void playersPage(BuildContext context) {

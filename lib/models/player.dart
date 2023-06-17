@@ -4,7 +4,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:futeba/models/position.dart';
-import 'package:futeba/models/slidable_action.dart';
 import 'package:futeba/models/team.dart';
 import 'package:futeba/screens/main_menu_page.dart';
 import 'package:futeba/screens/player_edit_page.dart';
@@ -13,7 +12,7 @@ import 'package:http/http.dart' as http;
 
 Future<List<Player>> fetchPlayers(http.Client client, String idTeam) async {
   final response = await client
-      .get(Uri.parse('http://10.0.2.2:8080/api/v1/players/team/$idTeam'));
+      .get(Uri.parse('http://localhost:8080/api/v1/players/team/$idTeam'));
   if (response.statusCode == 200 || response.statusCode == 201) {
     return parsePlayer(response.body);
   } else {
@@ -23,7 +22,7 @@ Future<List<Player>> fetchPlayers(http.Client client, String idTeam) async {
 
 Future<Player> deletePlayer(String id) async {
   final response =
-      await http.delete(Uri.parse('http://10.0.2.2:8080/api/v1/players/$id'));
+      await http.delete(Uri.parse('http://localhost:8080/api/v1/players/$id'));
   if (response.statusCode == 200) {
     return Player.fromJson(jsonDecode(response.body));
   } else {
@@ -155,30 +154,42 @@ class _PlayersPageState extends State<PlayersPage>
       itemBuilder: (BuildContext context, int index) {
         final item = players[index];
         return Slidable(
-          key: Key(item.name),
-          dismissal: SlidableDismissal(
-            child: SlidableDrawerDismissal(),
-            onDismissed: (type) {
-              final action = SlidableAction.excluir;
-              onDismissed(item, action);
-            },
-          ),
-          actionPane: SlidableDrawerActionPane(),
-          child: buildListTile(item),
-          secondaryActions: <Widget>[
-            IconSlideAction(
-              caption: 'Excluir',
-              color: Colors.red,
-              icon: Icons.delete_outline_outlined,
-              onTap: () => onDismissed(item, SlidableAction.excluir),
+          key: ValueKey(0), // A key is necessary.
+          startActionPane: ActionPane(
+            dismissible: DismissiblePane(
+              onDismissed: () {
+                // Remove this Slidable from the widget tree.
+              },
             ),
-            IconSlideAction(
-              caption: 'Editar',
-              color: Colors.blueGrey,
-              icon: Icons.edit_outlined,
-              onTap: () => playerEdit(context, item),
-            )
-          ],
+            motion: const DrawerMotion(),
+            children: [
+              SlidableAction(
+                label: 'Archive',
+                backgroundColor: Colors.blue,
+                icon: Icons.archive,
+                onPressed: (context) {},
+              ),
+            ],
+          ),
+          endActionPane: ActionPane(
+            motion: const DrawerMotion(),
+            extentRatio: 0.25,
+            children: [
+              SlidableAction(
+                label: 'Excluir',
+                backgroundColor: Colors.red,
+                icon: Icons.delete_outline_outlined,
+                onPressed: (context) {},
+              ),
+              SlidableAction(
+                label: 'Editar',
+                backgroundColor: Colors.blueGrey,
+                icon: Icons.edit_outlined,
+                onPressed: (context) {},
+              ),
+            ],
+          ),
+          child: buildListTitle(item),
         );
       },
     );
@@ -202,13 +213,18 @@ class _PlayersPageState extends State<PlayersPage>
             builder: (context) => PlayersPage(team: widget.team)));
   }
 
-  Widget buildListTile(Player item) => ListTile(
+  Widget buildListTitle(Player item) => ListTile(
         leading: CircleAvatar(
           backgroundColor: Colors.white,
           backgroundImage: AssetImage('assets/images/atleta.png'),
         ),
-        title: new Text(item.name),
-        subtitle: new Text(item.position.name),
+        title: new Text(item.name,
+            style: TextStyle(
+                color: Colors.grey[800],
+                fontWeight: FontWeight.w900,
+                fontFamily: 'Open Sans')),
+        subtitle: new Text(item.position.name,
+            style: TextStyle(fontStyle: FontStyle.italic)),
         trailing: Icon(Icons.keyboard_arrow_right),
         onTap: () {
           print("Detalhes do Atleta");

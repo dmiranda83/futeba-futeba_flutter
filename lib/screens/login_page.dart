@@ -150,7 +150,7 @@ class _LoginPageState extends State<LoginPage> {
       Map<String, dynamic> jsonMap = {'email': email, 'password': password};
       String jsonString = json.encode(jsonMap);
       var response = await http.post(
-          Uri.parse("http://10.0.2.2:8080/api/v1/user/login"),
+          Uri.parse("http://localhost:8080/api/v1/user/login"),
           headers: <String, String>{
             'Content-Type': 'application/json; charset=UTF-8'
           },

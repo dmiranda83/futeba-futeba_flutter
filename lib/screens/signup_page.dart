@@ -152,7 +152,7 @@ class _SignupPageState extends State<SignupPage> {
       };
       String jsonString = json.encode(jsonMap);
       var response = await http.post(
-          Uri.parse("http://10.0.2.2:8080/api/v1/user/signup"),
+          Uri.parse("http://localhost:8080/api/v1/user/signup"),
           headers: <String, String>{
             'Content-Type': 'application/json; charset=UTF-8'
           },
