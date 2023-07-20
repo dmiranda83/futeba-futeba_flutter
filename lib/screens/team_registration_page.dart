@@ -387,8 +387,8 @@ class _TeamRegistrationState extends State<TeamRegistration> {
   void showAlertDialogOnOkCallback(Team team) {
     AwesomeDialog(
       context: context,
-      dialogType: DialogType.SUCCES,
-      animType: AnimType.BOTTOMSLIDE,
+      dialogType: DialogType.success,
+      animType: AnimType.bottomSlide,
       title: 'Equipe cadastrada com sucesso!',
       btnOkOnPress: () {
         Navigator.push(context,

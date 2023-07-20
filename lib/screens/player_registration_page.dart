@@ -166,8 +166,8 @@ class _PlayerRegistrationState extends State<PlayerRegistration> {
   void showAlertDialogOnOkCallback() {
     AwesomeDialog(
       context: context,
-      dialogType: DialogType.SUCCES,
-      animType: AnimType.BOTTOMSLIDE,
+      dialogType: DialogType.success,
+      animType: AnimType.bottomSlide,
       title: 'Atleta cadastrado com sucesso!',
       btnOkOnPress: () {
         Navigator.push(
@@ -181,8 +181,8 @@ class _PlayerRegistrationState extends State<PlayerRegistration> {
   void showAlertDialogOnOkCallbackError() {
     AwesomeDialog(
       context: context,
-      dialogType: DialogType.INFO,
-      animType: AnimType.BOTTOMSLIDE,
+      dialogType: DialogType.info,
+      animType: AnimType.bottomSlide,
       title: 'Atleta ja cadastrado!',
       btnOkOnPress: () {
         Navigator.push(

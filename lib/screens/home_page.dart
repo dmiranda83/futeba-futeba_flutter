@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:futeba/screens/login_page.dart';
 import 'package:futeba/screens/signup_page.dart';

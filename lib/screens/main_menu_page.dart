@@ -61,7 +61,7 @@ class _MainMenuState extends State<MainMenu> {
               Wrap(runSpacing: 10, children: [
                 modeButton('ATLETAS', FontAwesomeIcons.airbnb,
                     Color(0xFF2F80ED), width),
-                modeButton('TIMES', FontAwesomeIcons.footballBall,
+                modeButton('TIMES', FontAwesomeIcons.football,
                     Color(0xFFDF1D5A), width)
               ])
             ],

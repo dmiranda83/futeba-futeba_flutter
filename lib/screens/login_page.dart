@@ -147,10 +147,10 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> login(String email, String password) async {
     if (email.isNotEmpty && password.isNotEmpty) {
-      Map<String, dynamic> jsonMap = {'email': email, 'password': password};
+      Map<String, dynamic> jsonMap = {'login': email, 'senha': password};
       String jsonString = json.encode(jsonMap);
       var response = await http.post(
-          Uri.parse("http://localhost:8080/api/v1/user/login"),
+          Uri.parse("http://localhost:8080/v1/user/login"),
           headers: <String, String>{
             'Content-Type': 'application/json; charset=UTF-8'
           },

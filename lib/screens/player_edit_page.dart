@@ -170,8 +170,8 @@ class _PlayerEditState extends State<PlayerEdit> {
   void showAlertDialogOnOkCallback() {
     AwesomeDialog(
       context: context,
-      dialogType: DialogType.INFO,
-      animType: AnimType.BOTTOMSLIDE,
+      dialogType: DialogType.info,
+      animType: AnimType.bottomSlide,
       title: 'Atleta atualizado com sucesso!',
       btnOkOnPress: () {
         Navigator.push(
